@@ -1,0 +1,26 @@
+{
+  "name": "",
+  "version": "0.1.0",
+  "main": "./src/index.js",
+  "keywords": [""],
+  "files": [
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "",
+  "license": "",
+  "scripts": {
+    "nucleo:d": "npm run nucleo:d",
+    "nucleo:download": "env-cmd ./scripts/windows/mega_nucleo_download.cmd",
+    "nucleo:u": "npm run nucleo:upload",
+    "nucleo:upload": "env-cmd ./scripts/windows/mega_nucleo_upload.cmd"
+  },
+  "bugs": {
+    "url": "",
+    "email": ""
+  },
+  "homepage": ""
+}
