@@ -1,8 +1,8 @@
 {
-  "name": "",
+  "name": "core-scripts",
   "version": "0.1.0",
   "main": "./src/index.js",
-  "keywords": [""],
+  "keywords": [],
   "files": [
     "src"
   ],
@@ -10,17 +10,18 @@
     "type": "git",
     "url": ""
   },
-  "author": "",
-  "license": "",
+  "author": "Ricardo Torrellas",
+  "core-scripts": "./src/index.js",
+  "license": "MIT",
   "scripts": {
     "nucleo:d": "npm run nucleo:d",
     "nucleo:download": "env-cmd ./scripts/windows/mega_nucleo_download.cmd",
     "nucleo:u": "npm run nucleo:upload",
     "nucleo:upload": "env-cmd ./scripts/windows/mega_nucleo_upload.cmd"
   },
-  "bugs": {
-    "url": "",
-    "email": ""
-  },
-  "homepage": ""
+  "homepage": "",
+  "description": "Scripts para complementar el flujo de una app.",
+  "directories": {
+    "doc": "docs"
+  }
 }
