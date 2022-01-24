@@ -1,27 +1,29 @@
 {
-  "name": "core-scripts",
-  "version": "0.1.0",
-  "main": "./src/index.js",
-  "keywords": [],
-  "files": [
-    "src"
-  ],
-  "repository": {
-    "type": "git",
-    "url": ""
-  },
-  "author": "Ricardo Torrellas",
-  "core-scripts": "./src/index.js",
-  "license": "MIT",
-  "scripts": {
-    "nucleo:d": "npm run nucleo:d",
-    "nucleo:download": "env-cmd ./scripts/windows/mega_nucleo_download.cmd",
-    "nucleo:u": "npm run nucleo:upload",
-    "nucleo:upload": "env-cmd ./scripts/windows/mega_nucleo_upload.cmd"
-  },
-  "homepage": "",
+  "name": "@core_/scripts",
+  "version": "0.1.1",
   "description": "Scripts para complementar el flujo de una app.",
+  "main": "./src/index.js",
+  "bin": {
+    "core-scripts": "./src/index.js"
+  },
   "directories": {
     "doc": "docs"
+  },
+  "scripts": {
+    "test": "core-scripts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rick-torrellas/core-scripts.git"
+  },
+  "author": "Ricardo Torrellas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Rick-torrellas/core-scripts/issues"
+  },
+  "homepage": "https://github.com/Rick-torrellas/core-scripts#readme",
+  "dependencies": {
+    "chalk": "^5.0.0",
+    "commander": "^8.3.0"
   }
 }
