@@ -24,7 +24,7 @@
 [🏠](#nav "Back home")
 
 ```javascript
-npm i 
+npm i @core_/scripts
 ```
 
 <h2 id="requirements">Requirements ⚠️</h2>
