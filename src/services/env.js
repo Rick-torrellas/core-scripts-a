@@ -1,3 +1,4 @@
+const path = require("path");
 const fs = require('fs');
 const envFile = path.join(process.cwd()+'/.env.core');
 function createEnv() {
