@@ -21,7 +21,7 @@ function createNucleo() {
         return false
       }
       fs.mkdirSync(folder);
-      if (verify.nucleo()) {
+      if (verifyNucleo()) {
         console.log('Nucleo creado');
         return true
         }

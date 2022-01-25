@@ -1,6 +1,6 @@
 {
   "name": "@core_/scripts",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "Scripts para complementar el flujo de una app.",
   "main": "./src/index.js",
   "bin": {
