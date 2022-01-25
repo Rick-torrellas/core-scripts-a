@@ -9,6 +9,8 @@ program
     if (cmdObj.debug) {
         //TODO: Ejecucion debug
     }
+    //TODO: Crearun proceso para crear el archivo .env.core, con las variables ya inicializadas
+    //TODO: Crear un proceso que verifique si existe el .nucleo, y si no lo cree
     package.packageInit();
 }
 )

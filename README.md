@@ -29,7 +29,7 @@ npm i @core_/scripts
 
 <h2 id="requirements">Requirements ⚠️</h2>
 
-* Para pasar las variables de entorno se necesita una archivo llamado: **.env.core**
+* Para pasar las variables de entorno se necesita una archivo llamado: **.env.core** y este archivo necesita ser ignorado en .gitignore
 * Se necesita el modulo [**env-cmd**](https://www.npmjs.com/package/env-cmd)
 * Se tiene que tener instalado **megatools**, para alguno de los comandos
 

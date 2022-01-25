@@ -1,4 +1,37 @@
 @echo off
+IF NOT DEFINED npm_package_name (
+echo Variable npm_package_name no esta definida
+call :end
+) 
+IF [%npm_package_name%]==[] (
+    echo La variable npm_package_name esta vacia 
+    call :end
+)
+IF NOT DEFINED carpeta (
+echo Variable carpeta no esta definida
+call :end
+) 
+IF [%carpeta%]==[] (
+    echo La variable carpeta esta vacia 
+    call :end
+)
+IF NOT DEFINED MEGA_MAIL_A (
+echo Variable MEGA_MAIL_A no esta definida
+call :end
+) 
+IF [%MEGA_MAIL_A%]==[] (
+    echo La variable MEGA_MAIL_A esta vacia 
+    call :end
+)
+IF NOT DEFINED MEGA_PASS_A (
+echo Variable MEGA_PASS_A no esta definida
+call :end
+) 
+IF [%MEGA_PASS_A%]==[] (
+    echo La variable MEGA_PASS_Aesta vacia 
+    call :end
+)
+:inicio
 set carpeta=.nucleo-%npm_package_name%
 @REM TODO: comprobar si las variables estan definidas y no estan vacias
 :check
@@ -33,4 +66,6 @@ if exist .nucleo (
 ) else (
     echo No existe la carpeta .nucleo
 )
+:end
+timeout /T 300
 exit
