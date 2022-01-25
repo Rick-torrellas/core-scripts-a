@@ -3,7 +3,6 @@ set carpeta=.nucleo-%npm_package_name%
 @REM TODO: comprobar si las variables estan definidas y no estan vacias
 :check
 @REM  TODO: Este deberia ser un script aparte
-echo %0
 megatools test -d /Root/%carpeta% -u %MEGA_MAIL_A% -p %MEGA_PASS_A%
 if %ERRORLEVEL% EQU 1 (
     echo No existe la carpeta destino en la cuenta de Mega
