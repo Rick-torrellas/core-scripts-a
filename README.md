@@ -7,6 +7,7 @@
 <h2 id="nav">Nav🏠 </h2>
 
 * [Instalation 🔑](#instalation)
+* [Usage 🔰](#usage)
 * [Requirements ⚠️](#requirements)
 * [Environment variables 🔐](#environment-variables)
 * [Dependencies 📁](#dependencies)
@@ -26,6 +27,28 @@
 ```javascript
 npm i @core_/scripts
 ```
+<h2 id="usage">Usage 🔰</h2>
+
+[🏠](#nav "Back home")
+
+Para empezar a usar la herramienta, en el directorio de tu proyecto, usa:
+
+```npm
+npx core-scripts
+```
+
+## Comandos
+
+* init: Inicia los elemtentos de la app
+
+## Comandos NPM
+
+* nucleo:d - Descarga el nucleo de mega
+* nucleo:u - Carga el nucleo a mega
+* mongol:u - Carga la base de datos mongo local
+* mongol:d - Descarga la base de datos mongo local
+* mongoe:u - Carga la base de datos mongo externa
+* mongoe:d - Descarga la base de datos mongo externa
 
 <h2 id="requirements">Requirements ⚠️</h2>
 

@@ -1,5 +1,8 @@
 const program = require('commander');
 const package = require('./../services/package');
+const dependencies = require('./../services/dependencies');
+const env = require('./../services/env');
+const nucleo = require('./../services/nucleo');
 program
 .command('init')
 .description('Para agregar los scripts al package.json, por defecto agregara scripts de cmd')
@@ -12,5 +15,8 @@ program
     //TODO: Crearun proceso para crear el archivo .env.core, con las variables ya inicializadas
     //TODO: Crear un proceso que verifique si existe el .nucleo, y si no lo cree
     package.packageInit();
+    dependencies.dependenciesInit();
+    env.createEnv();
+    nucleo.nucleoInit();
 }
 )

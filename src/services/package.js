@@ -1,16 +1,13 @@
 const path = require('path');
 const fs = require('fs');
 
-function packageLocation() {
-    const package = path.join(`${process.cwd()}/package.json`);
-    return package;
-}
+const packageLocation = path.join(`${process.cwd()}/package.json`);
 
 function packageInit() {
 packageInitCmd();
 }
 function packageInitCmd() {
-    const package = packageLocation();
+    const package = packageLocation;
     const read = fs.readFileSync(package);
     const data = JSON.parse(read);
     const env_file = './.env.core';
