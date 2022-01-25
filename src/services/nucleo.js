@@ -15,7 +15,7 @@ function nucleoInit() {
     createContentNucleo();
 }
 function createNucleo() {
-    var folder = nucleoInit;
+    var folder = nucleoPath;
       if (verifyNucleo()) {
     console.log('Ya existe el nucleo');
         return false
