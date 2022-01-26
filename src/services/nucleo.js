@@ -48,8 +48,8 @@ function hiddenNucleo() {
           console.log(`stderr: ${stderr}`);
           return;
       }
-      });
       console.log(`Resultado: ${stdout}`);
+      });
 }
 function createContentNucleo() {
        const object = nucleoContent;
