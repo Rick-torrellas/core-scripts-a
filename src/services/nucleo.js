@@ -1,5 +1,7 @@
+const { exec } = require("child_process");
 const path = require("path");
 const fs = require('fs');
+const { stdout, stderr } = require("process");
 const nucleoPath = path.join(process.cwd()+'/.nucleo');
 const nucleoContent = {
     "img": path.join(`${process.cwd()}/.nucleo/img`),
@@ -37,7 +39,17 @@ function verifyNucleo() {
 }
 function hiddenNucleo() {
     const nucleo = nucleoPath;
-      execSync(`attrib +h ${nucleo}`);
+      exec(`attrib +h ${nucleo}`,(error,stdout,stderr)=>{
+        if (error) {
+          console.log(`error: ${error.message}`);
+          return;
+      }
+      if (stderr) {
+          console.log(`stderr: ${stderr}`);
+          return;
+      }
+      });
+      console.log(`Resultado: ${stdout}`);
 }
 function createContentNucleo() {
        const object = nucleoContent;

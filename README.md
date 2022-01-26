@@ -52,7 +52,7 @@ npx core-scripts
 
 <h2 id="requirements">Requirements ⚠️</h2>
 
-* Para pasar las variables de entorno se necesita una archivo llamado: **.env.core** y este archivo necesita ser ignorado en .gitignore
+* Para pasar las variables de entorno se necesita una archivo llamado: **.env.core** y este archivo necesita ser ignorado en .gitignore. **NOTA**: si se quiere mas seguridad a la hora de usar la contrasena, eliminarla del uri, y colocarla manualmente cuando lo pida.
 * Se necesita el modulo [**env-cmd**](https://www.npmjs.com/package/env-cmd)
 * Se tiene que tener instalado **megatools**, para alguno de los comandos
 
