@@ -8,12 +8,12 @@ const nucleoContent = {
     "video": path.join(`${process.cwd()}/.nucleo/video`),
     "audio": path.join(`${process.cwd()}/.nucleo/audio`),
     "txt": path.join(`${process.cwd()}/.nucleo/txt`),
-    "data": path.join(`${process.cwd()}/.nucleo/data`),
     "custom": path.join(`${process.cwd()}/.nucleo/custom`),
-    "sql": "",
-    "mongo": "",
-    "json": "",
-    "custom": ""
+    "data": path.join(`${process.cwd()}/.nucleo/data`),
+    "sql": path.join(`${process.cwd()}/.nucleo/data/sql`),
+    "mongo": path.join(`${process.cwd()}/.nucleo/data/mongo`),
+    "json": path.join(`${process.cwd()}/.nucleo/data/json`),
+    "data_custom": path.join(`${process.cwd()}/.nucleo/data_custom`)
 }
 function nucleoInit() {
     createNucleo();
