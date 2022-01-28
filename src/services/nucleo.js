@@ -1,6 +1,7 @@
 const { exec } = require("child_process");
 const path = require("path");
 const {existsSync,mkdir} = require('fs');
+const {name,values,error,done} = require('./debug');
 const nucleoPath = path.join(process.cwd()+'/.nucleo');
 const nucleoContent = {
 //TODO: unir las rutas con el nucleoPath
@@ -13,40 +14,68 @@ const nucleoContent = {
     "sql": path.join(`${process.cwd()}/.nucleo/data/sql`),
     "mongo": path.join(`${process.cwd()}/.nucleo/data/mongo`),
     "json": path.join(`${process.cwd()}/.nucleo/data/json`),
-    "data_custom": path.join(`${process.cwd()}/.nucleo/data_custom`)
+    "data_custom": path.join(`${process.cwd()}/.nucleo/data/data_custom`)
 }
-function nucleoInit() {
-    createNucleo();
-    hiddenNucleo();
-    createContentNucleo();
+function nucleoInit({debug}) {
+const NAME_ = 'nucleoInit';
+if(debug)name(NAME_,'service');
+    createNucleo({debug});
+    if (verifyNucleo({debug})) {
+      hiddenNucleo({debug});
+      createContentNucleo();
+    } else {
+      error('No existe el nucleo, no se puede volver invisible y no se le puede agregar el contenido');
+    }
+if(debug)done(NAME_);
 }
-function createNucleo() {
+function createNucleo({debug}) {
+const NAME_ = 'createNucleo';
+if(debug)name(NAME_,'service');
     var folder = nucleoPath;
-      if (verifyNucleo()) {
+const arg = {
+  folder
+}
+if(debug)values(arg);
+      if (verifyNucleo({debug})) {
     console.log('Ya existe el nucleo');
-        return false
+        return false;
       }
       mkdir(folder,(err) => {
         if (err) throw err;
       });
-      if (verifyNucleo()) {
+      if (verifyNucleo({debug})) {
         console.log('Nucleo creado');
+if(debug)done(NAME_);
         return true
         }
-        console.log('Error al crear el nucleo');
+        error('Error al crear el nucleo')
       return false
 }
-function verifyNucleo() {
+function verifyNucleo({debug}) {
+const NAME_ = 'verifyNucleo';
+if(debug)name(NAME_);
+const arg = {
+  nucleoPath
+}
+if(debug)values(arg);
     if (existsSync(nucleoPath)) {
         return true
       } else {
         return false
       }
 }
-function hiddenNucleo() {
+function hiddenNucleo({debug}) {
 //FIXME: no funciona
+const NAME_ = 'hiddenNucleo';
+if(debug)name(NAME_,'service');
     const nucleo = nucleoPath;
-      exec(`attrib +h ${nucleo}`,(error,stdout,stderr)=>{
+    const command = `attrib +h "${nucleo}"`;
+  const arg = {
+    nucleo,
+    command
+  }
+  if(debug)values(arg);
+      exec(command,(error,stdout,stderr)=>{
         if (error) {
           console.log(`error: ${error.message}`);
           return;
@@ -56,6 +85,7 @@ function hiddenNucleo() {
           return;
       }
       console.log(`Resultado: ${stdout}`);
+      if(debug)done(NAME_);
       });
 }
 function createContentNucleo() {
@@ -66,12 +96,12 @@ function createContentNucleo() {
            if (existsSync(element) == false) {
              mkdir(element,(err) => {
               if (err) throw err;
+              if (existsSync(element)) {
+                console.log(`Se creo correctamente: '${key}`);
+              } else {
+                console.log(`'No se pudo crear: '${key}`);
+              }
             })
-             if (existsSync(element)) {
-               console.log(`Se creo correctamente: '${key}`);
-             } else {
-               console.log(`'No se pudo crear: '${key}`);
-             }
            } else {
              console.log(`${key}:' Ya esta creado'`);
            }

@@ -16,7 +16,6 @@
 [menu](#kanbas)
 
 * Crear un comando para mostrarte los comandos npm
-* Falta crear un debug urgente
 
 ## DOING
 
@@ -32,6 +31,7 @@
 
 ## FIX
 
+* el orden de ejucion esta muy loco, hay algunas funciones aynscornas, tenemos que eliminarlas, para que todo se ejecute en cascada.
 [menu](#kanbas)
 
 ## sources

@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/Rick-torrellas/core-scripts#readme",
   "dependencies": {
-    "chalk": "^5.0.0",
+    "chalk": "^4.1.0",
     "commander": "^8.3.0"
   }
 }

@@ -3,20 +3,18 @@ const package = require('./../services/package');
 const dependencies = require('./../services/dependencies');
 const env = require('./../services/env');
 const nucleo = require('./../services/nucleo');
+const {start} = require('./../services/debug');
 program
 .command('init')
 .description('Para agregar los scripts al package.json, por defecto agregara scripts de cmd')
 .option('-d, --debug', 'Ejecuta un depurador del codigo')
-.option('-d, --batch', 'Ejecuta un depurador del codigo')
+.option('-b, --batch', 'Ejecuta un depurador del codigo')
 .action((cmdObj) => {
-    if (cmdObj.debug) {
-        //TODO: Ejecucion debug
-    }
-    //TODO: Crearun proceso para crear el archivo .env.core, con las variables ya inicializadas
-    //TODO: Crear un proceso que verifique si existe el .nucleo, y si no lo cree
-    package.packageInit();
+    const {debug} = cmdObj;
+    if (debug) start();
+    package.packageInit({debug});
     dependencies.dependenciesInit();
     env.createEnv();
-    nucleo.nucleoInit();
+    nucleo.nucleoInit({debug});
 }
 )
