@@ -1,4 +1,5 @@
 const { exec } = require("child_process");
+// TODO: verificar si existe ya esta dependencia, para no volverla a instalar
 function dependenciesInit() {
     exec("npm i env-cmd",(error,stdout, stderr)=> {
         console.log('Instalando dependencias:')

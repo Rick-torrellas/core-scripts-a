@@ -1,15 +1,19 @@
 const { exec } = require("child_process");
 const path = require("path");
-const fs = require('fs');
-const { stdout, stderr } = require("process");
+const {existsSync,mkdir} = require('fs');
 const nucleoPath = path.join(process.cwd()+'/.nucleo');
 const nucleoContent = {
+//TODO: unir las rutas con el nucleoPath
     "img": path.join(`${process.cwd()}/.nucleo/img`),
     "video": path.join(`${process.cwd()}/.nucleo/video`),
     "audio": path.join(`${process.cwd()}/.nucleo/audio`),
     "txt": path.join(`${process.cwd()}/.nucleo/txt`),
     "data": path.join(`${process.cwd()}/.nucleo/data`),
-    "custom": path.join(`${process.cwd()}/.nucleo/custom`)
+    "custom": path.join(`${process.cwd()}/.nucleo/custom`),
+    "sql": "",
+    "mongo": "",
+    "json": "",
+    "custom": ""
 }
 function nucleoInit() {
     createNucleo();
@@ -22,7 +26,7 @@ function createNucleo() {
     console.log('Ya existe el nucleo');
         return false
       }
-      fs.mkdirSync(folder);
+      mkdir(folder);
       if (verifyNucleo()) {
         console.log('Nucleo creado');
         return true
@@ -31,13 +35,14 @@ function createNucleo() {
       return false
 }
 function verifyNucleo() {
-    if (fs.existsSync(nucleoPath)) {
+    if (existsSync(nucleoPath)) {
         return true
       } else {
         return false
       }
 }
 function hiddenNucleo() {
+//FIXME: no funciona
     const nucleo = nucleoPath;
       exec(`attrib +h ${nucleo}`,(error,stdout,stderr)=>{
         if (error) {
@@ -56,9 +61,9 @@ function createContentNucleo() {
        for (const key in object) {
          if (object.hasOwnProperty(key)) {
            const element = object[key];
-           if (fs.existsSync(element) == false) {
-             fs.mkdirSync(element)
-             if (fs.existsSync(element)) {
+           if (existsSync(element) == false) {
+             mkdir(element)
+             if (existsSync(element)) {
                console.log(`Se creo correctamente: '${key}`);
              } else {
                console.log(`'No se pudo crear: '${key}`);
