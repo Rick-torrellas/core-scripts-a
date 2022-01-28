@@ -26,7 +26,9 @@ function createNucleo() {
     console.log('Ya existe el nucleo');
         return false
       }
-      mkdir(folder);
+      mkdir(folder,(err) => {
+        if (err) throw err;
+      });
       if (verifyNucleo()) {
         console.log('Nucleo creado');
         return true
@@ -62,7 +64,9 @@ function createContentNucleo() {
          if (object.hasOwnProperty(key)) {
            const element = object[key];
            if (existsSync(element) == false) {
-             mkdir(element)
+             mkdir(element,(err) => {
+              if (err) throw err;
+            })
              if (existsSync(element)) {
                console.log(`Se creo correctamente: '${key}`);
              } else {
