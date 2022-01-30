@@ -16,6 +16,7 @@
 [menu](#kanbas)
 
 * Crear un comando para mostrarte los comandos npm
+* Habilitar el modo debug, en los scripts de cmd, usando una variable de entorno DEBUG
 
 ## DOING
 
