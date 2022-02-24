@@ -1,6 +1,6 @@
 # core-scripts
 
-<img src="" alt="title" width="20%">
+<img src="./public/icon.png" alt="title" width="20%">
 
 <h2 id="description">Description 📃</h2>
 
@@ -78,6 +78,7 @@ MONGO_USER - Usuario de mongo
 MONGO_PASSWORD - Contrasena de mongo
 MONGO_URI_DOWNLOAD - Ruta de coneccion de mongo para descargar la base de datos
 MONGO_URI_UPLOAD - Ruta de coneccion mongo para cargar la base de datos
+DEBUG - Para activar el modo debug (default false)
 ```
 
 <h2 id="screenshots">Screenshots 🖼️</h2>

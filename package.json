@@ -10,13 +10,13 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "core-scripts"
+    "docs": "jsdoc -c jsdoc.json"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rick-torrellas/core-scripts.git"
   },
-  "author": "Ricardo Torrellas",
+  "author": "Ricardo Torrellas <ricardo.torrejas@gmail.com> (https://github.com/Rick-torrellas)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Rick-torrellas/core-scripts/issues"
@@ -24,6 +24,7 @@
   "homepage": "https://github.com/Rick-torrellas/core-scripts#readme",
   "dependencies": {
     "chalk": "^4.1.0",
-    "commander": "^8.3.0"
+    "commander": "^8.3.0",
+    "jsdoc": "^3.6.10"
   }
 }

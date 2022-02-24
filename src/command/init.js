@@ -1,5 +1,5 @@
 const program = require('commander');
-const package = require('./../services/package');
+const {packageInit} = require('./../services/package');
 const dependencies = require('./../services/dependencies');
 const env = require('./../services/env');
 const nucleo = require('./../services/nucleo');
@@ -21,7 +21,7 @@ program
 )
 function initCmd({debug,onlyEnvFile,onlyNucleo,onlyDependencies,onlyPackage}) {
     if (onlyPackage) {
-        package.packageInit({debug},()=>{});
+        packageInit({debug},()=>{});
         return;
     }
     if (onlyEnvFile) {
@@ -39,7 +39,7 @@ function initCmd({debug,onlyEnvFile,onlyNucleo,onlyDependencies,onlyPackage}) {
     initCmdDefault();
 }
 function initCmdDefault({debug}) {
-    package.packageInit({debug},()=>{
+    packageInit({debug},()=>{
         dependencies.dependenciesInit();
     });
     env.createEnv();
