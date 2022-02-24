@@ -4,9 +4,12 @@
 
 <h2 id="description">Description 📃</h2>
 
+Una coleccion de scripts, para complementar procesos en toda aplicacion.
+
 <h2 id="nav">Nav🏠 </h2>
 
 * [Instalation 🔑](#instalation)
+* [Docs 📚](https://rick-torrellas.github.io/core-scripts/)
 * [Usage 🔰](#usage)
 * [Requirements ⚠️](#requirements)
 * [Environment variables 🔐](#environment-variables)
