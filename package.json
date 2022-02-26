@@ -10,7 +10,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "docs": "jsdoc -c jsdoc.json"
+    
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,6 @@
   "homepage": "https://github.com/Rick-torrellas/core-scripts#readme",
   "dependencies": {
     "chalk": "^4.1.0",
-    "commander": "^8.3.0",
-    "jsdoc": "^3.6.10"
+    "commander": "^8.3.0"
   }
 }
