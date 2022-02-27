@@ -1,0 +1,3 @@
+@REM //TODO: para resolver el problemas d elas rutas, se va a crerar una variable en el .env.core "COPY_PATH", cada ruta sera separada por , y sera usada dentro de un bucle for, para copiarla a todas las rutas, 
+@REM //TODO: en el caso del usb, sera una variable aparte "COPY_USB_PATH", que buscara entre todos los discos dispobles usando un loop, como antes lo habiamos echo. 
+@REM //TODO: tambien se puede tratar de usar ftp,para otros sistemas como linux e android.

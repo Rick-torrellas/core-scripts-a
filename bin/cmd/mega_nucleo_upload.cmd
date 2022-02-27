@@ -1,18 +1,20 @@
 @echo off
-IF NOT DEFINED npm_package_name (
-echo Variable npm_package_name no esta definida
-call :end
-) 
-IF [%npm_package_name%]==[] (
-    echo La variable npm_package_name esta vacia 
-    call :end
-)
+:var_check
+set carpeta=.nucleo-%npm_package_name%
 IF NOT DEFINED carpeta (
 echo Variable carpeta no esta definida
 call :end
 ) 
 IF [%carpeta%]==[] (
     echo La variable carpeta esta vacia 
+    call :end
+)
+IF NOT DEFINED npm_package_name (
+echo Variable npm_package_name no esta definida
+call :end
+) 
+IF [%npm_package_name%]==[] (
+    echo La variable npm_package_name esta vacia 
     call :end
 )
 IF NOT DEFINED MEGA_MAIL_A (
@@ -31,9 +33,30 @@ IF [%MEGA_PASS_A%]==[] (
     echo La variable MEGA_PASS_Aesta vacia 
     call :end
 )
-:inicio
-set carpeta=.nucleo-%npm_package_name%
-@REM TODO: comprobar si las variables estan definidas y no estan vacias
+IF NOT DEFINED DEBUG (
+echo Variable DEBUG no esta definida
+call :end
+) 
+IF [%DEBUG%]==[] (
+    echo La variable DEBUG esta vacia 
+    call :end
+)
+:debug
+IF [%DEBUG%]==[true] (
+    echo Debugger activado
+)
+IF [%DEBUG%]==[true] (
+    echo carpeta - %carpeta%
+)
+IF [%DEBUG%]==[true] (
+    echo npm_package_name - %npm_package_name%
+)
+IF [%DEBUG%]==[true] (
+    echo MEGA_MAIL_A - %MEGA_MAIL_A%
+)
+IF [%DEBUG%]==[true] (
+    echo MEGA_PASS_A - %MEGA_PASS_A%
+)
 :check
 @REM  TODO: Este deberia ser un script aparte
 megatools test -d /Root/%carpeta% -u %MEGA_MAIL_A% -p %MEGA_PASS_A%

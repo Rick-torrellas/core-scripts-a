@@ -1,3 +1,4 @@
+//@ts-check
 const chalk = require('chalk');
 const {log} = console;
 /**
@@ -22,7 +23,9 @@ function name(name,type='no-type') {
     return log(`${chalk.bgCyan('Process Name:')} ${name} \n`,`${chalk.underline.cyan('Type')}: ${type}`);
 }
 /**
- * Para dar alguna informacion.
+ * Para dar alguna informacion. 
+ * 
+ * **Nota**: no necesita tener el debug activado, si quieres usar una vercion con el debug activado usar {@link data}
  * @param {string} title El titulo de la informacion.
  * @param {string} description La descripcion de la informacion.
  * @returns {void}
@@ -31,20 +34,49 @@ function info(title,description="no description") {
     return log(`${chalk.blue("Info")}: ${chalk.blue.underline(title)}\n`,description);
 }
 /**
- * Es igual que info, solo que este si necesita tener el debugger activado para ejecutarse.
+ * Para dar alguna informacion. 
+ * 
+ * **Nota**: necesita tener el debug activado, si quieres usar una vercion que no necesite el debug activado usar {@link info}
  */
 function data() {
 
 }
+/**
+ * Para indicar que existe un error critico.
+ * 
+ * Tambien puedes hacer una advertencia con {@link warning}
+ * @param {string} title El titulo del error.
+ * @param {*} error Una explicacion detallada del error. 
+ * @returns {void}
+ */
 function error(title,error = 'no description') {
     return log(`${chalk.red('ERROR')}: ${chalk.red.underline(title)}\n`,error);
 }
+/**
+ * Indica una advertencia, sobre algo que puede causar un error, o que podria ser mas optimo.
+ * 
+ * Para indicar un {@link error}
+ * @param {*} title El titulo de la advertencia.
+ * @param {*} description La descripcion de la advertencia.
+ * @returns {void}
+ */
 function warning(title,description='no description') {
     return log(`${chalk.yellow('WARNING')}: ${chalk.yellow.underline(title)}\n`,description)
 }
+/**
+ * Muestra los valores que se usan en una funcion.
+ * @param {*} values Valores de una funcion
+ * @returns {void}
+ */
 function values(values) {
     return log(`${chalk.green('Values')}:\n`, values);
 }
+/**
+ * Indica la finalisacion de un proceso o una funcion.
+ * @param {*} title El titulo de la funcion.
+ * @param {*} mensaje El mensaje final.
+ * @returns 
+ */
 function done(title,mensaje = 'Done') {
     return log(`${title}: ${chalk.blue(mensaje)}`);
 }
