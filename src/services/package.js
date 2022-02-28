@@ -7,6 +7,7 @@ const { exec } = require("child_process");
 const {join} = require('path');
 const {readFileSync,writeFile} = require('fs');
 //TODO: implementar el debuger sin destrcuturarlo.
+//TODO: cambiar todos los readFileSync por readFile asyncrono. Para usar sus callbacks.
 const {name,values,error,done,info,warning} = require('./debug');
 /**
  * La ubicacion del package.json del proyecto actual.
@@ -15,6 +16,7 @@ const packageLocation = join(`${process.cwd()}/package.json`);
 /**
  * La ubicacion del archivo .env.core
  */
+//TODO: Esto deberiamos exportarlo del modulo env.
 const env_file_path="./.env.core";
 /**
  * La ruta donde se guardan los scripts cmd.
@@ -41,8 +43,10 @@ const cmd_scripts = {
  */
 function packageInit({debug},callback) {
 //TODO: crear un proceso donde verifiquemos si existe el archivo pacjage.json
+//TODO: unir esta funcion, con la funcion del proceso total.
     const NAME_ = 'packageInit';
     const cmdScripts = cmd_scripts;
+//TODO: para solucionar el problema con los scripts, se va a crar unas condicionales, puede ser con un switch o else if, donde segun si sea batch powershell o cmd, se creara la variable sripts.
     if(debug)name(NAME_,'service');
     packageInitCmd({debug,scripts:cmdScripts});
     if(debug)done(NAME_);
@@ -70,12 +74,12 @@ function packageInitCmd({debug,scripts}) {
     if (debug)values(arg);
     const read = readFileSync(Package,'utf-8');
     if (!read) {
-        packageCmdEmpty({debug,scripts,Package});
+        packageEmpty({debug,scripts,Package});
         return;
     }
     if (read) {
         const data = JSON.parse(read);
-        packageCMdScript({data,debug,scripts,Package});
+        checkScriptObject({data,debug,scripts,Package});
     }
     if (debug) done(NAME_);
 }
@@ -92,8 +96,8 @@ function packageInitCmd({debug,scripts}) {
  * @return {boolean} - Retornara "true", si esta vacio el package de lo contrario retornara "false".
  */
 //TODO: esta funcion no debe continuar con el proceso de inyectar el script, solo debe hacer su trabajo de iniciar un nuevo paquete. retornara true si el proceso es exitoso, false si no se puede cumplir el proceso.
-function packageCmdEmpty({debug,scripts,Package}) {
-    const NAME_ = 'packageCmdEmpty';
+function packageEmpty({debug,scripts,Package}) {
+    const NAME_ = 'packageEmpty';
     if (debug) name(NAME_,'subservice');
         error('El package esta vacio, iniciando un nuevo package');
         newPackage({debug},()=>{
@@ -101,7 +105,7 @@ function packageCmdEmpty({debug,scripts,Package}) {
             if(read) {
                 const data = JSON.parse(read);
                 deleteDependencies({debug,data,Package});
-                packageCMdScript({debug,data,scripts,Package});
+                checkScriptObject({debug,data,scripts,Package});
             } else {
                 error('No se puede iniciar un nuevo package');
             }
@@ -152,13 +156,13 @@ if(debug)done(NAME_);
 * @return {void}
  */
 //TODO: esta funcion no debe inyectar los scripts, tan solo verificar si existe el objeto scripts, true si existe, false en caso de que no exista.
-function packageCMdScript({data,debug,scripts,Package}) {
-    const NAME_ = 'packageCMdScript';
+function checkScriptObject({data,debug,scripts,Package}) {
+    const NAME_ = 'checkScriptObject';
     if (debug) name(NAME_,'subservice');
         info('El package tiene contenido');
         if (data.scripts == undefined && !data.hasOwnProperty('scripts')) {
             warning('No existe la propiedad scripts, creando scripts');
-            scriptsCmd({debug,data,scripts,Package});
+            createScriptObject({debug,data,scripts,Package});
         } else {
             info('Modificando la propiedad scripts');
             packageCmd({debug,data,scripts,Package});
@@ -180,8 +184,8 @@ function packageCMdScript({data,debug,scripts,Package}) {
 * @param scripts - Los scripts para ser inyectados en el package.json
  */
 //TODO: Esta funcion solo debe de encargarse de crear el objeto scripts, no de inyectar los scripts.
-function scriptsCmd({debug,data,scripts,Package}) {
-    const NAME_ = 'scriptsCmd';
+function createScriptObject({debug,data,scripts,Package}) {
+    const NAME_ = 'createScriptObject';
     if (debug) name(NAME_,'service');
     const object = scripts;
     data.scripts = {}

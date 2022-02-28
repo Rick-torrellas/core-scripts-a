@@ -21,6 +21,7 @@
 * Para que el debuger sea mas facil de ejecutar, en vez de usar condicionales a cada rato, pasar el valor del debuger como un parametro y condicionarlo directamente en las funciones del debuger.
   * ejemplo: debug.info(debug,code);
 * Crear base de datos llamado core, con tablas users,nucleo, de manera que se pueda guardar, los nucleos de las diferentes aplicaciones, y que esten relacionados a los users, para saber los datos relacionales de cada app, por ejuemplo en que cuentas de mega, estan guardadas ciertas apps, y que esten vinculadas a ciertos usiarios'. Asi se puede usar por varias personas con privacidad.
+* Crear un commando que verifique, si se tiene los componentes instalados con el init.
 
 ## DOING
 
