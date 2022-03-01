@@ -5,5 +5,6 @@ program
 .description('Para pruebas')
 .option('-p, --pene ', 'Penetracion')
 .action((cmdObj) => {
+    
 }
 )

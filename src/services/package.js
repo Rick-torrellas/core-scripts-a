@@ -2,26 +2,39 @@
  * Modulo para controlar las funciones relacionadas con el package.json. 
  * @module services/env
  */
-//TODO: Cambiar el nombre de las funciones que llevan cmd, ya no es necesario, por que estan echas para funcionar con cualquiera.
 const { exec } = require("child_process");
 const {join} = require('path');
 const {readFileSync,writeFile} = require('fs');
 //TODO: implementar el debuger sin destrcuturarlo.
 //TODO: cambiar todos los readFileSync por readFile asyncrono. Para usar sus callbacks.
 const {name,values,error,done,info,warning} = require('./debug');
+const {envFileRelative} = require('./env');
+//              typedef
+/**
+ * 
+ * @typedef {import("./../typedef").defaults} defaults 
+ */
+/**
+ * @typedef {import("./../typedef").script} script
+ */
+// --
+//          Variables
 /**
  * La ubicacion del package.json del proyecto actual.
  */
 const packageLocation = join(`${process.cwd()}/package.json`);
 /**
- * La ubicacion del archivo .env.core
+ * La ubicacion del archivo .env.core . Mirar {@link envFileRelative}
  */
-//TODO: Esto deberiamos exportarlo del modulo env.
-const env_file_path="./.env.core";
+const env_file_path=envFileRelative;
 /**
  * La ruta donde se guardan los scripts cmd.
  */
 const cmd_scripts_path="./node_modules/@core_/scripts/bin/cmd";
+/**
+ * La ruta donde se guardan los scripts bash.
+ */
+const bash_scripts_path="./node_modules/@core_/scripts/bin/bash";
 /**Va a guardar los scripts cmd, que se van a usar en el package.json
  */
 const cmd_scripts = {
@@ -33,39 +46,35 @@ const cmd_scripts = {
     "mongoe:d": `env-cmd -f ${env_file_path} ${cmd_scripts_path}/mongo_externe_download.cmd`
 
 }
+/**Va a guardar los scripts bash, que se van a usar en el package.json
+ */
+ const bash_scripts = {
+    "nucleo:d": `env-cmd -f ${env_file_path} ${bash_scripts_path}/mega_nucleo_download.sh`,
+    "nucleo:u": `env-sh -f ${env_file_path} ${bash_scripts_path}/mega_nucleo_upload.sh`,
+    "mongol:u": `env-sh -f ${env_file_path} ${bash_scripts_path}/mongo_local_upload.sh`,
+    "mongol:d": `env-sh -f ${env_file_path} ${bash_scripts_path}/mongo_local_download.sh`,
+    "mongoe:u": `env-sh -f ${env_file_path} ${bash_scripts_path}/mongo_externe_upload.sh`,
+    "mongoe:d": `env-sh -f ${env_file_path} ${bash_scripts_path}/mongo_externe_download.sh`
+}
+// --
+//              Funciones
 /**
- * Iniciara el proceso para inyectar los scripts en el package.json, determinara si usar scripts, batch, powrshell o cmd. Por defecto usara cmd.
+ * Iniciara el proceso para inyectar los scripts en el package.json, determinara si usar scripts, bash, powrshell o cmd. Por defecto usara cmd.
  * @param {{
     debug: boolean
+    defaults: defaults
+    scripts: script
  * }}
- * debug - Para activar el modo debug
+ * Debug - Para activar el modo debug
+ * @param defaults - Valores por defecto para los procesos.
+ * @param script Para escojer que scripts inyectar.
  * @return {void}
  */
-function packageInit({debug},callback) {
-//TODO: crear un proceso donde verifiquemos si existe el archivo pacjage.json
+function packageInit({Debug,defaults,script},callback) {
 //TODO: unir esta funcion, con la funcion del proceso total.
     const NAME_ = 'packageInit';
-    const cmdScripts = cmd_scripts;
-//TODO: para solucionar el problema con los scripts, se va a crar unas condicionales, puede ser con un switch o else if, donde segun si sea batch powershell o cmd, se creara la variable sripts.
     if(debug)name(NAME_,'service');
-    packageInitCmd({debug,scripts:cmdScripts});
-    if(debug)done(NAME_);
-    callback();
-}
-/**
- * Esta funcion se encarga de verificar que los scripts sean inyectados correctamente, viendo si existe el package.json, viendo que no este vacio y que exista el objeto scripts en el. 
- * @param {{
-    debug: boolean
-    scripts: String[]
- * }} 
- * debug - Para activar el modo debug.
- * @param scripts - Los scripts que se van a inyectar.
- * @return {void}
- */
-//TODO: modificar el proceso, aqui se usa packageCmdEmpty
-function packageInitCmd({debug,scripts}) {
-    const NAME_ = 'packageInitCmd';
-    if (debug) name(NAME_,'sub-service');
+    const scripts = choseScript({Debug,defaults,script});
     const Package = packageLocation;
     const arg = {
         Package,
@@ -73,47 +82,91 @@ function packageInitCmd({debug,scripts}) {
     }
     if (debug)values(arg);
     const read = readFileSync(Package,'utf-8');
+// proceso en caso de que este vacio el package.json
     if (!read) {
-        packageEmpty({debug,scripts,Package});
+        processPackageEmpty({Debug,scripts,Package},()=> {
+            const read = readFileSync(Package,'utf-8');
+            if (read) {
+                const data = JSON.parse(read);
+                if (!checkScriptObject({data,Debug})) {
+                    
+                }
+            }
+        });
         return;
     }
+// proceso en caso de que no exista el objeto script
     if (read) {
         const data = JSON.parse(read);
-        checkScriptObject({data,debug,scripts,Package});
+        checkScriptObject({data,Debug,scripts,Package});
     }
-    if (debug) done(NAME_);
+// proceso en que todo esta bien y solo anade los scripts.
+    if(debug)done(NAME_);
+    callback();
+}
+/**
+ * Determina que scripts inyectar en el package.json, ya sea bash, cmd o powershell. Por defecto inyectara cmd.
+ * @param Debug Para activar el debuger
+ * @param defaults Los valores por defecto para el package.
+ * @param scripts Los scripts para escojer cual script inyectar.
+ * @returns 
+ */
+function choseScript({Debug,defaults,script}) {
+    const {sh,cmd} = script;
+    const {package_: {
+        scripts_
+    }} = defaults;
+    if (sh) {
+        const script = bash_scripts;
+        return script;
+    } else if (cmd) {
+        const script = cmd_scripts;
+        return script;
+    } else {
+        switch (scripts_) {
+            case "cmd":
+        const script = cmd_scripts;   
+        return script; 
+            case "sh":
+        const script = bash_scripts;   
+        return script; 
+        }
+    }
 }
 /**
  * En caso de que el package.json este vacio, se iniciara un nuevo package con "npm init -y", y continuara con el proceso para agregar los scripts. 
  * @param {{
     debug: boolean
-    scripts: string[]
     Package: string
  * }}
  * debug - Para activar el modo debug
- * @param scripts - Los scripts para ser inyectados en el package.json
  * @param Package - La ruta del package.json a ser inyectado.
- * @return {boolean} - Retornara "true", si esta vacio el package de lo contrario retornara "false".
+ * @return - Retornara "true", si esta vacio el package de lo contrario retornara "false".
  */
-//TODO: esta funcion no debe continuar con el proceso de inyectar el script, solo debe hacer su trabajo de iniciar un nuevo paquete. retornara true si el proceso es exitoso, false si no se puede cumplir el proceso.
-function packageEmpty({debug,scripts,Package}) {
+//TODO: esta funcion no debe continuar con el proceso de inyectar el script, solo debe hacer su trabajo de iniciar un nuevo paquete. eso quiere decir 
+function processPackageEmpty({debug,Package},callback) {
     const NAME_ = 'packageEmpty';
     if (debug) name(NAME_,'subservice');
-        error('El package esta vacio, iniciando un nuevo package');
-        newPackage({debug},()=>{
+        warning('El package esta vacio, iniciando un nuevo package');
+     newPackage({debug},()=>{
     const read = readFileSync(Package,'utf-8');
             if(read) {
                 const data = JSON.parse(read);
                 deleteDependencies({debug,data,Package});
-                checkScriptObject({debug,data,scripts,Package});
+                return;
+//TODO: colocar un debug.succeess aqui
             } else {
                 error('No se puede iniciar un nuevo package');
+                return;
             }
-            if(debug)done(NAME_);
         });
-}
+callback();
+if(debug)done(NAME_);
+    }
 /**
  * Vacia las dependencias, por alguna razon, cuando se inicia un nuevo paquete se crean un monton de dependencias.
+ * 
+ * ? esta funcion se podria reusar, si se enfoca en vacias cualquier propiedad de un json, se llamaria emptyObject y perteneceria al serivicio json.
  * @param {{
     debug: boolean
     data: any
@@ -151,27 +204,26 @@ if(debug)done(NAME_);
  * }}
  * debug - Para activar el modo debug.
 * @param data - El package.json que se esta editando.
-* @param Package - La ruta del package.json que se esta editando.
-* @param scripts - Los scripts para ser inyectados en el package.json
 * @return {void}
  */
-//TODO: esta funcion no debe inyectar los scripts, tan solo verificar si existe el objeto scripts, true si existe, false en caso de que no exista.
-function checkScriptObject({data,debug,scripts,Package}) {
+function checkScriptObject({data,debug}) {
     const NAME_ = 'checkScriptObject';
     if (debug) name(NAME_,'subservice');
-        info('El package tiene contenido');
         if (data.scripts == undefined && !data.hasOwnProperty('scripts')) {
-            warning('No existe la propiedad scripts, creando scripts');
-            createScriptObject({debug,data,scripts,Package});
+            warning('No existe la propiedad scripts');
+            if(debug)done(NAME_);
+            return false;
         } else {
-            info('Modificando la propiedad scripts');
-            packageCmd({debug,data,scripts,Package});
+            info('Existe la propiedad scripts');
+            if(debug)done(NAME_);
+            return true;
         }
         
-    if(debug)done(NAME_);
 }
 /**
  * Esta funcion se encarga de crear una nueva propiedad scripts, en caso de que no exista en el package.json y inyectar los scripts.
+ * 
+ * ? no es mejor transformar esta funcion que agrege cualquier objeto en el package.json?
  * @param {{
     debug: boolean
     data: any
@@ -207,6 +259,8 @@ function createScriptObject({debug,data,scripts,Package}) {
 }
 /**
  * Inyectara los scripts, al package.json.
+ * 
+ * ? esta funcion podria resultilizarse, si se enfoca en agregar cualquier tipo de porpiedades a un objeto, puede pertenencer al serivicio json_, y e podria llamar addProperties
  * @param {{
     debug: boolean
     data: any
@@ -219,8 +273,8 @@ function createScriptObject({debug,data,scripts,Package}) {
  * @param Package - La ruta del package.json que se editara.
  * @return {void}
  */
-function packageCmd({debug,data,scripts,Package}) {
-    const NAME_ = 'packageCmd';
+function addScripts({debug,data,scripts,Package}) {
+    const NAME_ = 'addScripts';
     if (debug) name(NAME_,'service');
     const object = scripts;
 for (const key in object) {
@@ -273,6 +327,8 @@ if(debug)values(arg);
 }
 /**
  * Verifica si existe el package.json
+ * 
+ * ? no seria mejor que esta fuere una funcion para verificar archivos en si. para un servicio aparte llamado files.
 * @param {{
     debug: boolean
     Package: string
@@ -290,6 +346,16 @@ const arg = {
 if(debug)values(arg);
 
 }
+/**
+ * Verifica si existen los scripts inyectados con {@link addScripts} en el package.json.
+ * 
+ * ? esta funcion podria ser checkProperties, de cuaquier archivo json, las properties se pasan por parametro. Pertenece al servicio, json_.
+ */
+//TODO: falta por terminar
+function checkScripts() {
+
+}
+// --
 module.exports = {
     packageInit
 }

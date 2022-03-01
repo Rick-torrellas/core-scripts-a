@@ -22,6 +22,9 @@
   * ejemplo: debug.info(debug,code);
 * Crear base de datos llamado core, con tablas users,nucleo, de manera que se pueda guardar, los nucleos de las diferentes aplicaciones, y que esten relacionados a los users, para saber los datos relacionales de cada app, por ejuemplo en que cuentas de mega, estan guardadas ciertas apps, y que esten vinculadas a ciertos usiarios'. Asi se puede usar por varias personas con privacidad.
 * Crear un commando que verifique, si se tiene los componentes instalados con el init.
+* Crear un archivo de configuracion, core.config.json, para poder configurar la herramienta que haga ciertas cosas por defecto, por ejemplo en vez de ineyctar scripts cmd al comienzo que los haga con bash. Este archivo debe ser opcional. De echo no debe estar agregado en el comando init, para evitar saturar la raiz del proyecto.
+* Crear un comando delete, que desase todo lo creado por el commando init. no elimina el package.json, pero si elimina los scripts. Osea para resumir, elimina todo rastro del core en el proyecto.
+* Crear el comando reset, que viene siendo la fucion de delete mas init.
 
 ## DOING
 

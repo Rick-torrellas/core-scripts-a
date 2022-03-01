@@ -53,6 +53,13 @@ function error(title,error = 'no description') {
     return log(`${chalk.red('ERROR')}: ${chalk.red.underline(title)}\n`,error);
 }
 /**
+ * Indica que una operacion se ejecuto satisfactoriamente.
+ *  @param {string} title El titulo de la operacion.
+ */
+function success(title='no-title') {
+    log(`${chalk.bgGreen('Success:')} ${title}`)
+}
+/**
  * Indica una advertencia, sobre algo que puede causar un error, o que podria ser mas optimo.
  * 
  * Para indicar un {@link error}
