@@ -1,4 +1,3 @@
-//@ts-check
 const chalk = require('chalk');
 const {log} = console;
 /**
@@ -10,8 +9,10 @@ const {log} = console;
  * @param {string} mensaje El mensaje para indicar que el modo debugger esta activado. 
  * @returns {void}
  */
-function start(mensaje = 'Debug mode activated') {
-    return log(`${chalk.red(mensaje)}`);
+function start(Debug,mensaje = 'Debug mode activated') {
+    if (Debug) {
+        log(`${chalk.red(mensaje)}`);
+    }
 }
 /**
  * Sirve para dar un indentificador y dar un poco de contexto de la funcion, en el que se encuentra el debugger.
@@ -19,8 +20,10 @@ function start(mensaje = 'Debug mode activated') {
  * @param {string} type La clasificacion de funcion que uno le quiera dar.
  * @returns {void}
  */
-function name(name,type='no-type') {
-    return log(`${chalk.bgCyan('Process Name:')} ${name} \n`,`${chalk.underline.cyan('Type')}: ${type}`);
+function name(Debug,name,type='no-type') {
+    if (Debug) {
+        log(`${chalk.bgCyan('Process Name:')} ${name} \n`,`${chalk.underline.cyan('Type')}: ${type}`);
+    }
 }
 /**
  * Para dar alguna informacion. 
@@ -31,15 +34,17 @@ function name(name,type='no-type') {
  * @returns {void}
  */
 function info(title,description="no description") {
-    return log(`${chalk.blue("Info")}: ${chalk.blue.underline(title)}\n`,description);
+        log(`${chalk.blue("Info")}: ${chalk.blue.underline(title)}\n`,description);
 }
 /**
  * Para dar alguna informacion. 
  * 
  * **Nota**: necesita tener el debug activado, si quieres usar una vercion que no necesite el debug activado usar {@link info}
  */
-function data() {
-
+function data(Debug,title,description="no description") {
+    if (Debug) {
+        log(`${chalk.blue("Info")}: ${chalk.blue.underline(title)}\n`,description);
+    }
 }
 /**
  * Para indicar que existe un error critico.
@@ -49,15 +54,19 @@ function data() {
  * @param {*} error Una explicacion detallada del error. 
  * @returns {void}
  */
-function error(title,error = 'no description') {
-    return log(`${chalk.red('ERROR')}: ${chalk.red.underline(title)}\n`,error);
+function error(Debug,title,error = 'no description') {
+    if (Debug) {
+    log(`${chalk.red('ERROR')}: ${chalk.red.underline(title)}\n`,error);
+    }
 }
 /**
  * Indica que una operacion se ejecuto satisfactoriamente.
  *  @param {string} title El titulo de la operacion.
  */
-function success(title='no-title') {
-    log(`${chalk.bgGreen('Success:')} ${title}`)
+function success(Debug,message='no-title') {
+    if (Debug) {
+        log(`${chalk.bgGreen('Success:')} ${message}`)
+    }
 }
 /**
  * Indica una advertencia, sobre algo que puede causar un error, o que podria ser mas optimo.
@@ -67,16 +76,20 @@ function success(title='no-title') {
  * @param {*} description La descripcion de la advertencia.
  * @returns {void}
  */
-function warning(title,description='no description') {
+function warning(Debug,title,description='no description') {
+    if (Debug) {
     return log(`${chalk.yellow('WARNING')}: ${chalk.yellow.underline(title)}\n`,description)
+    }
 }
 /**
  * Muestra los valores que se usan en una funcion.
  * @param {*} values Valores de una funcion
  * @returns {void}
  */
-function values(values) {
-    return log(`${chalk.green('Values')}:\n`, values);
+function values(Debug,values) {
+    if (Debug) {
+        return log(`${chalk.green('Values')}:\n`, values);
+    }
 }
 /**
  * Indica la finalisacion de un proceso o una funcion.
@@ -84,8 +97,10 @@ function values(values) {
  * @param {*} mensaje El mensaje final.
  * @returns 
  */
-function done(title,mensaje = 'Done') {
-    return log(`${title}: ${chalk.blue(mensaje)}`);
+function done(Debug,title,mensaje = 'Done') {
+    if (Debug) {
+        return log(`${title}: ${chalk.blue(mensaje)}`);
+    }
 }
 module.exports = {
     name,
@@ -94,5 +109,6 @@ module.exports = {
     warning,
     values,
     start,
+    success,
     done
 }

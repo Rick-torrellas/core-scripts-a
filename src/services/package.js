@@ -12,10 +12,10 @@ const {envFileRelative} = require('./env');
 //              typedef
 /**
  * 
- * @typedef {import("./../typedef").defaults} defaults 
+ * @typedef {import("../lib/typedef").defaults} defaults 
  */
 /**
- * @typedef {import("./../typedef").script} script
+ * @typedef {import("../lib/typedef").script} script
  */
 // --
 //          Variables
@@ -71,7 +71,6 @@ const cmd_scripts = {
  * @return {void}
  */
 function packageInit({Debug,defaults,script},callback) {
-//TODO: unir esta funcion, con la funcion del proceso total.
     const NAME_ = 'packageInit';
     if(debug)name(NAME_,'service');
     const scripts = choseScript({Debug,defaults,script});
@@ -82,27 +81,37 @@ function packageInit({Debug,defaults,script},callback) {
     }
     if (debug)values(arg);
     const read = readFileSync(Package,'utf-8');
-// proceso en caso de que este vacio el package.json
+// proceso en caso de que este vacio el package.json, se tiene que terminar el proceso, por que se esta usando callbacks.
     if (!read) {
         processPackageEmpty({Debug,scripts,Package},()=> {
-            const read = readFileSync(Package,'utf-8');
-            if (read) {
-                const data = JSON.parse(read);
-                if (!checkScriptObject({data,Debug})) {
-                    
-                }
-            }
+        processNoScript({Debug,Package,scripts})
         });
         return;
     }
 // proceso en caso de que no exista el objeto script
     if (read) {
         const data = JSON.parse(read);
-        checkScriptObject({data,Debug,scripts,Package});
+        checkProperty({data,Debug,scripts,Package});
     }
 // proceso en que todo esta bien y solo anade los scripts.
     if(debug)done(NAME_);
     callback();
+}
+/**
+ * Proceso para manejar el obejto script.
+ * 
+ * Verifica si existe, el objeto script y si no lo crea, tambien agrega los scripts.
+ */
+function processNoScript({Debug,Package,scripts}) {
+    const read = readFileSync(Package,'utf-8');
+    if (read) {
+        const data = JSON.parse(read);
+        if (!checkProperty({data,Debug})) {
+            createScriptObject({Debug,data,Package},() => {
+                addScripts({Debug,data,scripts,Package})
+            });
+        } 
+    }
 }
 /**
  * Determina que scripts inyectar en el package.json, ya sea bash, cmd o powershell. Por defecto inyectara cmd.
@@ -152,7 +161,7 @@ function processPackageEmpty({debug,Package},callback) {
     const read = readFileSync(Package,'utf-8');
             if(read) {
                 const data = JSON.parse(read);
-                deleteDependencies({debug,data,Package});
+                emptyObject({debug,data,Package});
                 return;
 //TODO: colocar un debug.succeess aqui
             } else {
@@ -163,63 +172,7 @@ function processPackageEmpty({debug,Package},callback) {
 callback();
 if(debug)done(NAME_);
     }
-/**
- * Vacia las dependencias, por alguna razon, cuando se inicia un nuevo paquete se crean un monton de dependencias.
- * 
- * ? esta funcion se podria reusar, si se enfoca en vacias cualquier propiedad de un json, se llamaria emptyObject y perteneceria al serivicio json.
- * @param {{
-    debug: boolean
-    data: any
-    Package: string
- * }}
- * debug - Para activar el modo debug.
- * @param data - El package.json que se esta editando.
- * @param Package - La ruta del package.json que se esta editando.
- * @return {void}
- */
-function deleteDependencies({debug,data,Package}){
-const NAME_ = "deleteDependencies";
-if(debug)name(NAME_,'sub-services');
-if (data.dependencies !== undefined && data.hasOwnProperty('dependencies')) {
-data.dependencies = {};
-const complete = JSON.stringify(data,null,2);
-writeFile(Package,complete,(err) => {
-    if (err) {
-    error('Error al modificar el package.json');
-throw err;
-}
-console.log('Dependencias eliminadas');
-});
-}
-if(debug)done(NAME_);
-}
-/**
- * Este es el proceso para verificar si existe la propiedad script, en caso de que no exista se crea una nueva porpiedad script y se inyextaran los scripts en ella. En caso de que exista, tambien agregara los scripts.
- * ? es necesario clocar la funcion packageCmd aqui? no seria mejor dejarla aparte?
-* @param {{
-    debug: boolean
-    data: any
-    scripts: string[]
-    Package: string
- * }}
- * debug - Para activar el modo debug.
-* @param data - El package.json que se esta editando.
-* @return {void}
- */
-function checkScriptObject({data,debug}) {
-    const NAME_ = 'checkScriptObject';
-    if (debug) name(NAME_,'subservice');
-        if (data.scripts == undefined && !data.hasOwnProperty('scripts')) {
-            warning('No existe la propiedad scripts');
-            if(debug)done(NAME_);
-            return false;
-        } else {
-            info('Existe la propiedad scripts');
-            if(debug)done(NAME_);
-            return true;
-        }
-        
-}
+
 /**
  * Esta funcion se encarga de crear una nueva propiedad scripts, en caso de que no exista en el package.json y inyectar los scripts.
  * 
@@ -227,33 +180,26 @@ function checkScriptObject({data,debug}) {
  * @param {{
     debug: boolean
     data: any
-    scripts: string[]
     Package: string
  * }}
 * debug - Para activar el modo debug.
 * @param data - El package.json que se esta editando.
 * @param Package - La ruta del package.json que se esta editando.
-* @param scripts - Los scripts para ser inyectados en el package.json
+* @return Retorna el pacjage.json que se esta editando. 
  */
-//TODO: Esta funcion solo debe de encargarse de crear el objeto scripts, no de inyectar los scripts.
-function createScriptObject({debug,data,scripts,Package}) {
+//TODO: crear una estancia de la funcion, donde no le entreguen solo la data, y el tengo que hacer el proceso completo, para editar el json.
+function createScriptObject({Debug,data,Package},callback) {
     const NAME_ = 'createScriptObject';
     if (debug) name(NAME_,'service');
-    const object = scripts;
     data.scripts = {}
-    for (const key in object) {
-        if (object.hasOwnProperty.call(object, key)) {
-            const values = object[key];
-            data.scripts[key] = values;
-        }
-    }
     const complete = JSON.stringify(data,null,2);
     writeFile(Package,complete,(err) => {
         if (err) {
-        error('Error al modificar el package.json');
+        error('Error al crear el objeto script');
     throw err;
         }
-        console.log('package.json modificado!');
+        console.log('objeto script creado');
+        callback();
     });
     if (debug) done(NAME_);
 }
@@ -273,7 +219,7 @@ function createScriptObject({debug,data,scripts,Package}) {
  * @param Package - La ruta del package.json que se editara.
  * @return {void}
  */
-function addScripts({debug,data,scripts,Package}) {
+function addScripts({debug,data,scripts,Package},callback) {
     const NAME_ = 'addScripts';
     if (debug) name(NAME_,'service');
     const object = scripts;
@@ -290,6 +236,7 @@ for (const key in object) {
     throw err;
         }
         console.log('package.json modificado!');
+        callback();
     });
     if (debug) done(NAME_);
 }
@@ -323,7 +270,6 @@ if(debug)values(arg);
         callback();
         if(debug)done(NAME_);
     })
-//----------------------------------------------------------------------------------
 }
 /**
  * Verifica si existe el package.json
@@ -350,6 +296,8 @@ if(debug)values(arg);
  * Verifica si existen los scripts inyectados con {@link addScripts} en el package.json.
  * 
  * ? esta funcion podria ser checkProperties, de cuaquier archivo json, las properties se pasan por parametro. Pertenece al servicio, json_.
+ * 
+ * sync
  */
 //TODO: falta por terminar
 function checkScripts() {
