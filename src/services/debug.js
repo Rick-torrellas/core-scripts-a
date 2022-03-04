@@ -56,7 +56,7 @@ function data(Debug,title,description="no description") {
  */
 function error(Debug,title,error = 'no description') {
     if (Debug) {
-    log(`${chalk.red('ERROR')}: ${chalk.red.underline(title)}\n`,error);
+    console.error(`${chalk.red('ERROR')}: ${chalk.red.underline(title)}\n`,error);
     }
 }
 /**
