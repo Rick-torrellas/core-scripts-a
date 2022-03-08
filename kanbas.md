@@ -15,8 +15,8 @@
 
 [menu](#kanbas)
 
+* crear una opcion en las funciones sobre todo de los servicios, que sea check, que habilite o desabilite el chekeo de los componentes para el buen funcionamiento de la funcion. asi no se tendra que chekear dos veces la funcion, sobre todo las que tienen funciones dentro.
 * Crear un comando para mostrarte los comandos npm
-* Habilitar el modo debug, en los scripts de cmd, usando una variable de entorno DEBUG
 * Crear un proceso, que cree un log, este log sera un archivo de texto, que estara dentro de la carpeta nucleo, y tendra el resultado de cada proceso usado con los scripts, tanto errores, como operaciones realizadas, tambien incluira la fecha en que se realizo la tarea.
 * Para que el debuger sea mas facil de ejecutar, en vez de usar condicionales a cada rato, pasar el valor del debuger como un parametro y condicionarlo directamente en las funciones del debuger.
   * ejemplo: debug.info(debug,code);

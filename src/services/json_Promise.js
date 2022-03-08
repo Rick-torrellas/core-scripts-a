@@ -1,61 +1,12 @@
 const debug = require('./debug');
-/* TODO: crear una funcion que verifique, si el json esta vacio.
-const Package = packageLocation;
-    const read = readFile(Package,'utf-8',(err,data)=>{}); 
-if (!read) {
-    significa que esta vacio.
-}
-*/
-//TODO: comentar
-function addObject_case(props,data,object) {
-    const Objeto = object;
-    console.log(Objeto);
-    for (const key in Objeto) {
-          if (Objeto.hasOwnProperty.call(Objeto, key)) {
-              const values = Objeto[key];
-              switch (props.length) {
-                case 1:  
-            data[props[0]][key] = values;
-                break;
-                case 2:
-            data[props[0]][props[1]][key] = values;
-                break;
-                case 3:
-            data[props[0]][props[1]][props[2]][key] = values;
-                break;
-                case 4:
-            data[props[0]][props[1]][props[2]][props[3]][key] = values;
-                break;
-                case 5:
-            data[props[0]][props[1]][props[2]][props[3]][props[4]][key] = values;
-                break;
-                case 6:
-            data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][key] = values;
-                break;
-                case 7:
-            data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][key] = values;
-                break;
-                case 8:
-            data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][props[7]][key] = values;
-                break;
-                case 9:
-            data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][props[7]][props[8]][key] = values;
-                break;
-                case 10:
-            data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][props[7]][props[8]][props[9]][key] = values;
-                break;
-            }
-          }
-      }
-      return data;
-}
+const json_Sync = require('./json_Sync');
 /**
  * Inyecta propiedades y valores a una propiedad interna ya existente, interna es que pertenece a otras propiedades.
  * 
  * Las propiedades internas ya tienen que estar creadas.
  * @example 
  * ```
- * addInnerObject({object:{a: 'hola'},innerProps: ['propiedad','otraProp']});
+ * addValue({object:{a: 'hola'},innerProps: ['propiedad','otraProp']});
  * {
  *    propiedad: {
  *      otraProp: {
@@ -76,124 +27,54 @@ function addObject_case(props,data,object) {
  * @param innerProps Un array con strings que representara la ruta interna a la propiedades a la que le quieres agregar el objeto.
  * @return {Promise <boolean|void>} `true` si se pudo modificar el archivo json.
  */
-function addInnerObject({Debug,object,file,innerProps}) {
+function addValue({Debug,value,file,properties}) {
     const NAME_ = 'addObject';
-    const arrei = [];
     debug.name(Debug,NAME_,'service');
-    if (typeof innerProps == 'string') {
-        arrei.push(innerProps);
-        innerProps=arrei;
-    }
+    const checkProps = !json_Sync.checkProperty(data,properties);
+    const checkType =json_Sync.checkPropertyType(data,properties);
+// const ultimo = properties[properties.length - 1];
     return new Promise((resolve,reject)=> {
         readFile(file,'utf-8',(err,data)=>{
             if (err) {
                 return reject(err);
             }
+if (checkProps) return reject(`No existe la propiedad ${properties}`);
+if ((checkType == "string" || checkType == "number" || checkType == "boolean" || properties == null) && typeof value === 'object' ) return reject(`La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`);
+if (checkType == "object" && (typeof value == "string" || typeof value == "number" || typeof value == "boolean" || value == null)) return reject(`La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`)
             resolve(data);
         });
     })
-//TODO: otra que verifique si es un objeto checkPropertyType con === 'object'
     .then(read => {
         const data = JSON.parse(read);
-        const ultimo = innerProps[innerProps.length - 1];
         ultimo.toString();
-        if (checkInnerProperties_case(innerProps,data,ultimo)) {
-        const data_ = addObject_case(innerProps,data,object);
+        const data_ = addValueData(properties,data,value);
         const complete = JSON.stringify(data_,null,2);
         writeFile(file,complete,(err) => {
             if (err) {
             debug.done(Debug,NAME_);
             throw err;
         }
-        debug.data('Objetos crados', object);
+        debug.data('Objetos crados', value);
         debug.done(Debug,NAME_);
             return;
         });
         return true;
-        } else {
-            throw new Error(`No existe la propiedad ${ultimo}`);
-        }
-     
     })
     .catch(err => {
         debug.error(err);
     })
 }
-function checkInnerProperties_case(props,data,properties) {
-    const Objeto = object;
-    console.log(Objeto);
-    const values = Objeto[key];
-    
-        switch (props.length) {
-            case 1:  
-        if (data[props[0]][properties] !== undefined && data[props[0]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 2:
-        if (data[props[0]][props[1]][properties] !== undefined && data[props[0]][props[1]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }        
-            case 3:
-        if (data[props[0]][props[1]][props[2]][properties] !== undefined && data[props[0]][props[1]][props[2]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 4:
-        if (data[props[0]][props[1]][props[2]][props[3]][properties] !== undefined && data[props[0]][props[1]][props[2]][props[3]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 5:
-        if (data[props[0]][props[1]][props[2]][props[3]][props[4]][properties] !== undefined && data[props[0]][props[1]][props[2]][props[3]][props[4]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 6:
-        if (data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][key][properties] !== undefined && data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][key].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 7:
-        if (data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][properties] !== undefined && data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 8:
-        if (data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][props[7]][properties] !== undefined && data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][props[7]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 9:
-        if (data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][props[7]][props[8]][properties] !== undefined && data[props[0]][props[1]][props[2]][props[3]][props[4]][props[5]][props[6]][props[7]][props[8]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-            case 10:
-        if (data[props[0]][properties] !== undefined && data[props[0]].hasOwnProperty(properties)) {
-            return true;
-        } else {
-            return false;
-        }
-        }
-}
 /**
+ * Verificara si existe una propiedad en el jason.
  * 
+ * Puede ser una propiedad que este dentro de otra propiedad.
  * @param {*} file 
  * @param {*} properties 
  * @param {*} innerProps 
+ * @example `checkProperty('./archivo.json','vaso');` verifica si existe `vaso` o `checkProperty('./archivo.json','vaso.color');` verifica si existe `color` ola
  */
-function checkInnerProperties(file,properties,innerProps) {
+function checkProperty(file,properties,innerProps) {
+//TODO: actualizar. ver checkProperty sync.
     const NAME_ = 'addObject';
     const arrei = [];
     debug.name(NAME_,'service');
