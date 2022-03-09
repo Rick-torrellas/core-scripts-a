@@ -15,7 +15,7 @@
 //TODO: crear una estancia de la funcion, donde no le entreguen solo la data, y el tengo que hacer el proceso completo, para editar el json.
 function createProperties({ Debug, data, Package }, callback) {
   const NAME_ = "createProperties";
-  if (debug) name(NAME_, "service");
+    debug.name(NAME_, "service");
   data.scripts = {};
   const complete = JSON.stringify(data, null, 2);
   writeFile(Package, complete, (err) => {
@@ -94,22 +94,24 @@ function addObjects({ debug, data, scripts, Package }, callback) {
  * @returns {boolean} Retorna `true` si existe la propiedad, `false` si no existe.
  * @example `checkProperty(data,'valor')` verifica si existe `valor` o   `checkProperty(data,'valora.valorb.valorc')` verifica si existe `valorc`
  */
-function checkProperty(data, properties) {
+function checkProperty({ data, properties, check = true }) {
   if (data === undefined) throw new Error("data esta indefinido");
   if (properties === undefined) throw new Error("properties esta indefinido");
-  if (
-    typeof data !== "object" ||
-    data === null ||
-    typeof data == "function" ||
-    Array.isArray(data)
-  )
-    throw new Error(
-      `data nada mas puede ser un objeto, data es: ${typeof data}`
-    );
-  if (!isNaN(properties) || typeof properties !== "string")
-    throw new Error(
-      `properties nada mas puede ser una string, properties es: ${typeof properties}`
-    );
+  if (check) {
+    if (
+      typeof data !== "object" ||
+      data === null ||
+      typeof data == "function" ||
+      Array.isArray(data)
+    )
+      throw new Error(
+        `data nada mas puede ser un objeto, data es: ${typeof data}`
+      );
+    if (!isNaN(properties) || typeof properties !== "string")
+      throw new Error(
+        `properties nada mas puede ser una string, properties es: ${typeof properties}`
+      );
+  }
   //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   if (properties.indexOf(".") == -1) {
     if (data[properties] !== undefined && data.hasOwnProperty(properties)) {
@@ -155,23 +157,23 @@ function checkProperty(data, properties) {
  * @returns {boolean} Retorna `true` si existe la propiedad, `false` si no existe.
  * @example `checkProperty('./archivo.json','valor')` verifica si existe `valor` o   `checkProperty('./archivo.json','valora.valorb.valorc')` verifica si existe `valorc`
  */
-function checkPropertyOpen(file, properties) {
-  //TODO: verificar si el archivo.json esta vacio
-  // TODO: agregar el check opcional.
+function checkPropertyOpen({ file, properties }) {
   if (file === undefined) throw new Error("file esta indefinido");
   if (properties === undefined) throw new Error("properties esta indefinido");
   if (typeof file !== "string")
     throw new Error(
       `file nada mas puede ser una string, file es: ${typeof file}`
     );
-  if (!isNaN(properties) || typeof properties !== "string")
-    throw new Error(
-      `properties nada mas puede ser una string, properties es: ${typeof properties}`
-    );
-  //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   const read = readFileSync(file, "utf-8");
-  if (!read) throw new Error(`El archivo json esta vacio`);
   const data = JSON.parse(read);
+  if (check) {
+    if (!isNaN(properties) || typeof properties !== "string")
+      throw new Error(
+        `properties nada mas puede ser una string, properties es: ${typeof properties}`
+      );
+    if (!read) throw new Error(`El archivo json esta vacio`);
+  }
+  //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   if (properties.indexOf(".") == -1) {
     if (data[properties] !== undefined && data.hasOwnProperty(properties)) {
       return true;
@@ -218,46 +220,49 @@ function checkPropertyOpen(file, properties) {
  * @returns Regresa el tipo de propiedad a evaluar.
  * @example `checkPropertyType(data,'valor')` verifica el tipo `valor` o   `checkPropertyType(data,'valora.valorb.valorc')` verifica el tipo  `valorc`
  */
-function checkPropertyType(data, properties) {
+function checkPropertyType({ data, properties, check = true }) {
   //TODO: sacar una vercion de esta propiedad, pero para todas las propiedades.
   if (data === undefined) throw new Error("data esta indefinido");
   if (properties === undefined) throw new Error("properties esta indefinido");
-  if (
-    typeof data !== "object" ||
-    data === null ||
-    typeof data == "function" ||
-    Array.isArray(data)
-  )
-    throw new Error(
-      `data nada mas puede ser un objeto, data es: ${typeof data}`
-    );
-  if (!isNaN(properties) || typeof properties !== "string")
-    throw new Error(
-      `properties nada mas puede ser una string, properties es: ${typeof properties}`
-    );
-  if (!checkProperty(data, properties))
-    throw new Error(`La propiedad ${properties} es indefinida`);
+  if (check) {
+    if (
+      typeof data !== "object" ||
+      data === null ||
+      typeof data == "function" ||
+      Array.isArray(data)
+    )
+      throw new Error(
+        `data nada mas puede ser un objeto, data es: ${typeof data}`
+      );
+    if (!isNaN(properties) || typeof properties !== "string")
+      throw new Error(
+        `properties nada mas puede ser una string, properties es: ${typeof properties}`
+      );
+    if (!checkProperty({ data, properties, check: false }))
+      throw new Error(`La propiedad ${properties} es indefinida`);
+  }
   //TODO: hacer la verificacion a las propiedades del json. pero para que sea mucho mas eficiente es mejor que verifique todas las propiedades, para ver cual o cuales son indefinidos. :D
   //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   let resultado = eval(`data.${properties}`);
   return typeof resultado;
 }
-function checkPropertyTypeOpen(file, properties) {
-  //TODO: verificar si el archivo.json esta vacio
-  // TODO: agregar el check opcional.
+function checkPropertyTypeOpen({ file, properties, check = true }) {
   if (file === undefined) throw new Error("file esta indefinido");
   if (properties === undefined) throw new Error("properties esta indefinido");
   if (typeof file !== "string")
     throw new Error(`file nada mas puede ser string, file es: ${typeof file}`);
-  if (!isNaN(properties) || typeof properties !== "string")
-    throw new Error(
-      `properties nada mas puede ser una string, properties es: ${typeof properties}`
-    );
   const read = readFileSync(file, "utf-8");
-  if (!read) throw new Error(`El archivo json esta vacio`);
   const data = JSON.parse(read);
-  if (!checkProperty(data, properties))
-    throw new Error(`La propiedad ${properties} es indefinida`);
+
+  if (check) {
+    if (!read) throw new Error(`El archivo json esta vacio`);
+    if (!isNaN(properties) || typeof properties !== "string")
+      throw new Error(
+        `properties nada mas puede ser una string, properties es: ${typeof properties}`
+      );
+    if (!checkProperty({ data, properties }))
+      throw new Error(`La propiedad ${properties} es indefinida`);
+  }
   //TODO: hacer la verificacion a las propiedades del json. pero para que sea mucho mas eficiente es mejor que verifique todas las propiedades, para ver cual o cuales son indefinidos. :D
   //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   let resultado = eval(`data.${properties}`);
@@ -431,5 +436,5 @@ module.exports = {
   checkPropertyType,
   checkPropertyTypeOpen,
   addValueData,
-  addValueDataOpen
+  addValueDataOpen,
 };

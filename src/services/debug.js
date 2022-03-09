@@ -54,10 +54,8 @@ function data(Debug,title,description="no description") {
  * @param {*} error Una explicacion detallada del error. 
  * @returns {void}
  */
-function error(Debug,title,error = 'no description') {
-    if (Debug) {
+function error(title,error = 'no description') {
     console.error(`${chalk.red('ERROR')}: ${chalk.red.underline(title)}\n`,error);
-    }
 }
 /**
  * Indica que una operacion se ejecuto satisfactoriamente.
@@ -110,5 +108,6 @@ module.exports = {
     values,
     start,
     success,
-    done
+    done,
+    data
 }
