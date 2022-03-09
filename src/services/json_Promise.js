@@ -2,6 +2,20 @@ const debug = require("./debug");
 const json_Sync = require("./json_Sync");
 const { readFile, writeFile } = require("fs");
 //TODO: crear una funcion que inicie un arcivo json, osea que le coloque los {} iniciales. o []
+/* TODO: propiedades y valores
+ Proceso de modificacion de propiedades y valores
+ Para modificar las propiedades
+ * replaceProperty
+ Remplazara la propiedad ya existente, si no existe lanzara un error.
+ * deleteProperty
+ Eliminara una propiedad existente, si no existe lanzara un error.
+ * createProperty
+ Creara una nueva propiedad, si existe lanzara un error.
+ * addValueProperty
+ Anade un valor al valor de una propiedad ya existente, si no existe la propiedad se lanzara un error.
+ * putValueProperty
+ Anade valores a una propiedad, remplazando el valor anterior, pero respetndo el tipo de propiedad, si es string no le puede meter un object, etc.
+*/
 /**
  * Lee un archivo json.
  * @param {{{
