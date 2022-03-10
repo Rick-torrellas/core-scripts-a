@@ -1,4 +1,42 @@
 /**
+ * Remplazara la propiedad ya existente, si no existe lanzara un error.
+ */
+ function replacePropertyData({ data, properties, value }) {
+//TODO: crear una vercion open de esta funcion 
+  if (data == undefined) throw new Error("data esta indefinido");
+  if (properties == undefined) throw new Error("properties esta indefinido");
+  if (value == undefined) throw new Error("value esta indefinido");
+  const checkProps = checkProperty(data, properties);
+  if (
+    typeof data !== "object" ||
+    data === null ||
+    typeof data == "function" ||
+    Array.isArray(data)
+  )
+    throw new Error(
+      `data nada mas puede ser un objeto, data es: ${typeof data}`
+    );
+    if (!isNaN(properties) || typeof properties !== "string")
+    throw new Error(
+      `properties nada mas puede ser una string, properties es: ${typeof properties}`
+    );
+    if (!checkProps) throw new Error(`No existe la propiedad ${properties}`);
+// PROCESS
+  const props = properties.split('.');
+  console.log(props.length)
+  if (props.length == 1) {
+    data[props[0]] = value;
+    console.log(data)
+  } else {
+    let last = props.pop();
+    let noLast = props.join('.')
+    let add = eval(`data.${noLast}`);
+    add[last] = value;
+    data
+  }
+  return data;
+}
+/**
  * Esta funcion se encarga de crear una nueva propiedad scripts, en caso de que no exista en el package.json y inyectar los scripts.
  * 
  * ? no es mejor transformar esta funcion que agrege cualquier objeto en el package.json?
@@ -94,10 +132,9 @@ function addObjects({ debug, data, scripts, Package }, callback) {
  * @returns {boolean} Retorna `true` si existe la propiedad, `false` si no existe.
  * @example `checkProperty(data,'valor')` verifica si existe `valor` o   `checkProperty(data,'valora.valorb.valorc')` verifica si existe `valorc`
  */
-function checkProperty({ data, properties, check = true }) {
+function checkProperty({ data, properties }) {
   if (data === undefined) throw new Error("data esta indefinido");
   if (properties === undefined) throw new Error("properties esta indefinido");
-  if (check) {
     if (
       typeof data !== "object" ||
       data === null ||
@@ -111,7 +148,6 @@ function checkProperty({ data, properties, check = true }) {
       throw new Error(
         `properties nada mas puede ser una string, properties es: ${typeof properties}`
       );
-  }
   //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   if (properties.indexOf(".") == -1) {
     if (data[properties] !== undefined && data.hasOwnProperty(properties)) {
@@ -166,13 +202,11 @@ function checkPropertyOpen({ file, properties }) {
     );
   const read = readFileSync(file, "utf-8");
   const data = JSON.parse(read);
-  if (check) {
     if (!isNaN(properties) || typeof properties !== "string")
       throw new Error(
         `properties nada mas puede ser una string, properties es: ${typeof properties}`
       );
     if (!read) throw new Error(`El archivo json esta vacio`);
-  }
   //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   if (properties.indexOf(".") == -1) {
     if (data[properties] !== undefined && data.hasOwnProperty(properties)) {
@@ -220,11 +254,10 @@ function checkPropertyOpen({ file, properties }) {
  * @returns Regresa el tipo de propiedad a evaluar.
  * @example `checkPropertyType(data,'valor')` verifica el tipo `valor` o   `checkPropertyType(data,'valora.valorb.valorc')` verifica el tipo  `valorc`
  */
-function checkPropertyType({ data, properties, check = true }) {
+function checkPropertyType({ data, properties }) {
   //TODO: sacar una vercion de esta propiedad, pero para todas las propiedades.
   if (data === undefined) throw new Error("data esta indefinido");
   if (properties === undefined) throw new Error("properties esta indefinido");
-  if (check) {
     if (
       typeof data !== "object" ||
       data === null ||
@@ -238,23 +271,20 @@ function checkPropertyType({ data, properties, check = true }) {
       throw new Error(
         `properties nada mas puede ser una string, properties es: ${typeof properties}`
       );
-    if (!checkProperty({ data, properties, check: false }))
+    if (!checkProperty({ data, properties }))
       throw new Error(`La propiedad ${properties} es indefinida`);
-  }
   //TODO: hacer la verificacion a las propiedades del json. pero para que sea mucho mas eficiente es mejor que verifique todas las propiedades, para ver cual o cuales son indefinidos. :D
   //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   let resultado = eval(`data.${properties}`);
   return typeof resultado;
 }
-function checkPropertyTypeOpen({ file, properties, check = true }) {
+function checkPropertyTypeOpen({ file, properties }) {
   if (file === undefined) throw new Error("file esta indefinido");
   if (properties === undefined) throw new Error("properties esta indefinido");
   if (typeof file !== "string")
     throw new Error(`file nada mas puede ser string, file es: ${typeof file}`);
   const read = readFileSync(file, "utf-8");
   const data = JSON.parse(read);
-
-  if (check) {
     if (!read) throw new Error(`El archivo json esta vacio`);
     if (!isNaN(properties) || typeof properties !== "string")
       throw new Error(
@@ -262,11 +292,15 @@ function checkPropertyTypeOpen({ file, properties, check = true }) {
       );
     if (!checkProperty({ data, properties }))
       throw new Error(`La propiedad ${properties} es indefinida`);
-  }
   //TODO: hacer la verificacion a las propiedades del json. pero para que sea mucho mas eficiente es mejor que verifique todas las propiedades, para ver cual o cuales son indefinidos. :D
   //TODO: properties tambien debria aceptar numeros, :D tratar de que acepte solo strings y numeros.
   let resultado = eval(`data.${properties}`);
   return typeof resultado;
+}
+function replacePropertyData() {
+  /*
+    * 
+  */
 }
 /**
  * Agrega valores a un objeto json.
@@ -274,25 +308,22 @@ function checkPropertyTypeOpen({ file, properties, check = true }) {
     data: object
     properties: string
     value: any
-    check: boolean
  * }} 
  * data: Un objeto json para agregar los valores
  * @param properties: La ruta hacia la propiedad a modificar.
  * @param value: El valor a agregar a la propiedad, puede ser cualquier valor, incluso un objeto
- * @param check: Para habilitar el checkeo para el buen funcionamiento de la funcion
  * @returns Retorna la data modificada.
  * @example ```
- * addValueData(data,'valor_a.valor_b.valor_c','Epa'); o 
- * addValueData(data,'valor_a','Epa');
+ * putValueData(data,'valor_a.valor_b.valor_c','Epa'); o 
+ * putValueData(data,'valor_a','Epa');
  * ```
  */
-function addValueData({ data, properties, value, check = true }) {
+function putValueData({ data, properties, value }) {
   if (data == undefined) throw new Error("data esta indefinido");
   if (properties == undefined) throw new Error("properties esta indefinido");
   if (value == undefined) throw new Error("value esta indefinido");
-  if (check) {
-    const checkProps = !json_Sync.checkProperty(data, properties);
-    const checkType = json_Sync.checkPropertyType(data, properties);
+    const checkProps = checkProperty(data, properties);
+    const checkType = checkPropertyType(data, properties);
     if (condition) {
     }
     if (
@@ -308,7 +339,7 @@ function addValueData({ data, properties, value, check = true }) {
       throw new Error(
         `properties nada mas puede ser una string, properties es: ${typeof properties}`
       );
-    if (checkProps) throw new Error(`No existe la propiedad ${properties}`);
+    if (!checkProps) throw new Error(`No existe la propiedad ${properties}`);
     if (
       (checkType == "string" ||
         checkType == "number" ||
@@ -329,20 +360,29 @@ function addValueData({ data, properties, value, check = true }) {
       throw new Error(
         `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
       );
-  }
-  let add = eval(`data.${properties}`);
-  if (
-    typeof value == "string" ||
-    typeof value == "number" ||
-    typeof value == "boolean" ||
-    value == null
+// PROCESS
+if (
+  typeof value == "string" ||
+  typeof value == "number" ||
+  typeof value == "boolean" ||
+  value == null
   ) {
-    add = value;
+  const props = properties.split('.');
+  if (props.length == 1) {
+    data[props[0]] = value;
+  } else {
+    let last = props.pop();
+    let noLast = props.join('.')
+    let add = eval(`data.${noLast}`);
+    add[last] = value;
   }
-  for (const key in value) {
-    if (value.hasOwnProperty.call(value, key)) {
-      const values = value[key];
-      add[key] = values;
+  } else {
+    let add = eval(`data.${properties}`);
+    for (const key in value) {
+      if (value.hasOwnProperty.call(value, key)) {
+        const values = value[key];
+        add[key] = values;
+      }
     }
   }
   return data;
@@ -355,26 +395,23 @@ function addValueData({ data, properties, value, check = true }) {
     file: string
     properties: string
     value: any
-    check: boolean
  * }} 
  * file: Un archivo json para sacar el objeto.
  * @param properties: La ruta hacia la propiedad a modificar.
  * @param value: El valor a agregar a la propiedad, puede ser cualquier valor, incluso un objeto
- * @param check: Para habilitar el checkeo para el buen funcionamiento de la funcion
  * @returns Retorna la data modificada.
  * @example ```
- * addValueData('./archivo.json','valor_a.valor_b.valor_c','Epa'); o 
- * addValueData('./archivo.json','valor_a','Epa');
+ * putValueDataOpen('./archivo.json','valor_a.valor_b.valor_c','Epa'); o 
+ * putValueDataOpen('./archivo.json','valor_a','Epa');
  * ```
  */
-function addValueDataOpen({ file, properties, value, check = true }) {
+function putValueDataOpen({ file, properties, value }) {
   if (file == undefined) throw new Error("file esta indefinido");
   if (properties == undefined) throw new Error("properties esta indefinido");
   if (value == undefined) throw new Error("value esta indefinido");
   if (typeof file !== "string") throw new Error(`file solo puede ser string`);
   const read = readFileSync(file, "utf-8");
   const data = JSON.parse(read);
-  if (check) {
     if (!read) throw new Error(`El archivo json esta vacio`);
     const checkProps = !json_Sync.checkProperty(data, properties);
     const checkType = json_Sync.checkPropertyType(data, properties);
@@ -412,20 +449,28 @@ function addValueDataOpen({ file, properties, value, check = true }) {
       throw new Error(
         `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
       );
-  }
-  let add = eval(`data.${properties}`);
   if (
     typeof value == "string" ||
     typeof value == "number" ||
     typeof value == "boolean" ||
     value == null
   ) {
-    add = value;
-  }
-  for (const key in value) {
-    if (value.hasOwnProperty.call(value, key)) {
-      const values = value[key];
-      add[key] = values;
+    const props = properties.split('.');
+    if (props.length == 1) {
+      data[props[0]] = value;
+    } else {
+      let last = props.pop();
+      let noLast = props.join('.')
+      let add = eval(`data.${noLast}`);
+      add[last] = value;
+    }
+  } else {
+    let add = eval(`data.${properties}`);
+    for (const key in value) {
+      if (value.hasOwnProperty.call(value, key)) {
+        const values = value[key];
+        add[key] = values;
+      }
     }
   }
   return data;
@@ -435,6 +480,7 @@ module.exports = {
   checkPropertyOpen,
   checkPropertyType,
   checkPropertyTypeOpen,
-  addValueData,
-  addValueDataOpen,
+  putValueData,
+  putValueDataOpen,
+  replacePropertyData
 };

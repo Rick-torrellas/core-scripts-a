@@ -6,16 +6,39 @@ const { readFile, writeFile } = require("fs");
  Proceso de modificacion de propiedades y valores
  Para modificar las propiedades
  * replaceProperty
- Remplazara la propiedad ya existente, si no existe lanzara un error.
+ Remplazara la propiedad ya existente, si no existe lanzara un error. +
  * deleteProperty
- Eliminara una propiedad existente, si no existe lanzara un error.
+ Eliminara una propiedad existente, si no existe lanzara un error. Se puede usar el operador delete.
  * createProperty
  Creara una nueva propiedad, si existe lanzara un error.
  * addValueProperty
  Anade un valor al valor de una propiedad ya existente, si no existe la propiedad se lanzara un error.
  * putValueProperty
- Anade valores a una propiedad, remplazando el valor anterior, pero respetndo el tipo de propiedad, si es string no le puede meter un object, etc.
+ Anade valores a una propiedad, remplazando el valor anterior, pero respetndo el tipo de propiedad, si es string no le puede meter un object, etc. +
 */
+function replaceProperty({ Debug = false, data, properties, value }) {
+  /*
+   * Se verifica si existe la propiedad
+   * Si no se devuelve un error
+   * Luego se agrega la propiedad simplemente agregandola a la data, redefiniendola. data.propiedad = value
+   * duelve true si se logra la operacion
+   */
+  const NAME_ = "readJson";
+  debug.name(NAME_, "service");
+  // CONDICIONES
+  return new Promise((resolve, reject) => {
+    let data_ = json_Sync.replacePropertyData(data, properties,value);
+    const complete = JSON.stringify(data_, null, 2);
+    writeFile(file, complete, (err) => {
+      if (err) {
+        debug.done(Debug, NAME_);
+        return reject(err);
+      }
+      debug.data(Debug, "Objeto remplazado", value);
+      debug.done(Debug, NAME_);
+      resolve(true);
+  })
+}
 /**
  * Lee un archivo json.
  * @param {{{
@@ -24,16 +47,14 @@ const { readFile, writeFile } = require("fs");
  * @param file El archivo json a leer.
  * @returns {string} Retorna el contenido del archivo json como string.
  */
-function readJson({ Debug = false, file, check }) {
+function readJson({ Debug = false, file }) {
   const NAME_ = "readJson";
   debug.name(NAME_, "service");
   if (file == undefined) throw new Error("file esta indefinido");
   //TODO: crear un checket para que solo pueda leer .json, la viana es que indexOf() es sensibles a las mayusculas, entonces es mejor usar search() pero ese usa expreciones regulares.
   //TODO: implementar esta funcion en todas las funciones que requieran readFile.
-  if (check) {
-    if (typeof file !== "string")
-      throw new Error(`file nada mas puede ser string, file es ${typeof file}`);
-  }
+  if (typeof file !== "string")
+    throw new Error(`file nada mas puede ser string, file es ${typeof file}`);
   return new Promise((resolve, reject) => {
     readFile(file, "utf-8", (err, read) => {
       if (err) return reject(err);
@@ -50,14 +71,12 @@ function readJson({ Debug = false, file, check }) {
  * @param file El archivo json a leer.
  * @returns {object} Retorna el contenido del archivo json como un objeto.
  */
-function readJsonObject({ Debug = false, file, check }) {
+function readJsonObject({ Debug = false, file }) {
   const NAME_ = "readJson";
   debug.name(NAME_, "service");
   if (file == undefined) throw new Error("file esta indefinido");
-  if (check) {
-    if (typeof file !== "string")
-      throw new Error(`file nada mas puede ser string, file es ${typeof file}`);
-  }
+  if (typeof file !== "string")
+    throw new Error(`file nada mas puede ser string, file es ${typeof file}`);
   return new Promise((resolve, reject) => {
     readFile(file, "utf-8", (err, read) => {
       if (err) return reject(err);
@@ -83,59 +102,53 @@ function readJsonObject({ Debug = false, file, check }) {
  * @param properties Una string con la ruta hacia la propiedad que quieres modificar.
  * @return {Promise <boolean|void>} `true` si se pudo modificar el archivo json.
  * @example ```
- * addValue({Debug: true, value: {"propiedad_a": "valor","propiedad_b": "valor"},properties: "prop.masProps.estaProp"});
+ * putValuePropertyOpen({Debug: true, value: {"propiedad_a": "valor","propiedad_b": "valor"},properties: "prop.masProps.estaProp"});
  * ``` 
  */
-function addValueOpen({ Debug = false, value, file, properties, check = true }) {
-  //TODO: crear una vercion de esta funcion open addValueOpen
-  const NAME_ = "addObject";
+function putValuePropertyOpen({ Debug = false, value, file, properties }) {
+  const NAME_ = "putValuePropertyOpen";
   debug.name(Debug, NAME_, "service");
   if (value == undefined) throw new Error("value esta indefinido");
   if (file == undefined) throw new Error("file esta indefinido");
   if (properties == undefined) throw new Error("properties esta indefinido");
   return new Promise((resolve, reject) => {
-    resolve(readJsonObject({ Debug, file, check: false }));
+    resolve(readJsonObject({ Debug, file }));
   })
     .then((data) => {
-      if (check) {
-        const checkProps = json_Sync.checkProperty({
-          data,
-          properties,
-          check: false,
-        });
-        const checkType = json_Sync.checkPropertyType({
-          data,
-          properties,
-          check: false,
-        });
-        if (checkProps == false)
-          throw new Error(`No existe la propiedad ${properties}`);
-        if (
-          (checkType == "string" ||
-            checkType == "number" ||
-            checkType == "boolean" ||
-            properties == null) &&
-          typeof value === "object"
-        )
-          throw new Error(
-            `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
-          );
-        if (
-          checkType == "object" &&
-          (typeof value == "string" ||
-            typeof value == "number" ||
-            typeof value == "boolean" ||
-            value == null)
-        )
-          throw new Error(
-            `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
-          );
-      }
-      const data_ = json_Sync.addValueData({
+      const checkProps = json_Sync.checkProperty({
+        data,
+        properties,
+      });
+      const checkType = json_Sync.checkPropertyType({
+        data,
+        properties,
+      });
+      if (checkProps == false)
+        throw new Error(`No existe la propiedad ${properties}`);
+      if (
+        (checkType == "string" ||
+          checkType == "number" ||
+          checkType == "boolean" ||
+          properties == null) &&
+        typeof value === "object"
+      )
+        throw new Error(
+          `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
+        );
+      if (
+        checkType == "object" &&
+        (typeof value == "string" ||
+          typeof value == "number" ||
+          typeof value == "boolean" ||
+          value == null)
+      )
+        throw new Error(
+          `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
+        );
+      const data_ = json_Sync.putValueData({
         data,
         properties,
         value,
-        check: false,
       });
       const complete = JSON.stringify(data_, null, 2);
       writeFile(file, complete, (err) => {
@@ -143,7 +156,7 @@ function addValueOpen({ Debug = false, value, file, properties, check = true }) 
           debug.done(Debug, NAME_);
           throw err;
         }
-        debug.data("Objetos crados", value);
+        console.data("Objetos crados", value);
         debug.done(Debug, NAME_);
         return;
       });
@@ -169,56 +182,52 @@ function addValueOpen({ Debug = false, value, file, properties, check = true }) 
  * @param properties Una string con la ruta hacia la propiedad que quieres modificar.
  * @return {Promise <boolean|void>} `true` si se pudo modificar el archivo json.
  * @example ```
- * addValue({Debug: true, value: {"propiedad_a": "valor","propiedad_b": "valor"},properties: "prop.masProps.estaProp"});
+ * putValueProperty({Debug: true, value: {"propiedad_a": "valor","propiedad_b": "valor"},properties: "prop.masProps.estaProp"});
  * ``` 
  */
-function addValue({ Debug = false, value, data, properties, check = true }) {
+function putValueProperty({ Debug = false, value, data, properties }) {
   //TODO: crear una vercion de esta funcion open addValueOpen
-  const NAME_ = "addObject";
+  const NAME_ = "putValuePropertyOpen";
   debug.name(Debug, NAME_, "service");
   if (value == undefined) throw new Error("value esta indefinido");
-  if (file == undefined) throw new Error("file esta indefinido");
+  if (data == undefined) throw new Error("data esta indefinido");
   if (properties == undefined) throw new Error("properties esta indefinido");
   return new Promise((resolve, reject) => {
-    if (check) {
-      const checkProps = json_Sync.checkProperty({
-        data,
-        properties,
-        check: false,
-      });
-      const checkType = json_Sync.checkPropertyType({
-        data,
-        properties,
-        check: false,
-      });
-      if (checkProps == false)
-        return reject(`No existe la propiedad ${properties}`);
-      if (
-        (checkType == "string" ||
-          checkType == "number" ||
-          checkType == "boolean" ||
-          properties == null) &&
-        typeof value === "object"
-      )
-        return reject(
-          `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
-        );
-      if (
-        checkType == "object" &&
-        (typeof value == "string" ||
-          typeof value == "number" ||
-          typeof value == "boolean" ||
-          value == null)
-      )
-        return reject(
-          `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
-        );
-    }
-    const data_ = json_Sync.addValueData({
+    const checkProps = json_Sync.checkProperty({
+      data,
+      properties,
+    });
+    const checkType = json_Sync.checkPropertyType({
+      data,
+      properties,
+    });
+    if (checkProps == false)
+      return reject(`No existe la propiedad ${properties}`);
+    if (
+      (checkType == "string" ||
+        checkType == "number" ||
+        checkType == "boolean" ||
+        properties == null) &&
+      typeof value === "object"
+    )
+      return reject(
+        `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
+      );
+    if (
+      checkType == "object" &&
+      (typeof value == "string" ||
+        typeof value == "number" ||
+        typeof value == "boolean" ||
+        value == null)
+    )
+      return reject(
+        `La propiedad ${properties} es ${checkType} y value es ${typeof value}, no se puede realizar la insercion.`
+      );
+    // PROCESS
+    const data_ = json_Sync.putValueData({
       data,
       properties,
       value,
-      check: false,
     });
     const complete = JSON.stringify(data_, null, 2);
     writeFile(file, complete, (err) => {
@@ -226,11 +235,11 @@ function addValue({ Debug = false, value, data, properties, check = true }) {
         debug.done(Debug, NAME_);
         return reject(err);
       }
-      debug.data(Debug,"Objetos crados", value);
+      debug.data(Debug, "Objetos crados", value);
       debug.done(Debug, NAME_);
       resolve(true);
     });
-  })
+  });
 }
 /**
  * Verificara si existe una propiedad en el jason.
