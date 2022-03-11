@@ -97,27 +97,26 @@ async function packageInit({ Debug, defaults, script }) {
     read = await json_Promise.readJson({Debug,Package});
     if (!read) throw new Error('Error al reiniciar el package.json');
     data = JSON.parse(read);
-    await json_Promise.replaceProperty({Debug,data,properties: "dependencies",value: {}})
+    await json_Promise.replaceProperty({Debug,data,properties: "dependencies",value: {},file: Package});
   }
   data = data ? data : JSON.parse(read);
   // proceso en caso de que no exista el objeto script
   if (read) {
     scripts_validate = await json_Promise.checkProperty({Debug,data,properties:"scripts"});
     if (!scripts_validate) {
-      await json_Promise.createProperty({Debug,data,properties: "scripts",value: {}})
+      await json_Promise.createProperty({Debug,data,properties: "scripts",value: {},file: Package})
     }
   } else{
     throw new Error('El packaje.json esta vacio.');
   }
 if (read) {
-  await json_Promise.putValueProperty({Debug,data,value: scripts,properties: "scripts"});
+  await json_Promise.putValueProperty({Debug,data,value: scripts,properties: "scripts",file: Package});
 } else {
   throw new Error('El packaje.json esta vacio.');
 }
   // proceso en que todo esta bien y solo anade los scripts.
   debug.done(Debug, NAME_);
 }
-
 /**
  * Determina que scripts inyectar en el package.json, ya sea bash, cmd o powershell. Por defecto inyectara cmd.
  * @param Debug Para activar el debuger

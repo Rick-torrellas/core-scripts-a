@@ -20,7 +20,7 @@ const { readFile, writeFile } = require("fs");
  * putValueProperty +
  Anade valores a una propiedad, remplazando el valor anterior, pero respetndo el tipo de propiedad, si es string no le puede meter un object, etc. +
 */
-function createProperty({Debug,data,properties,value}) {
+function createProperty({Debug,data,properties,value,file}) {
  return new Promise((resolve,reject)=>{
 // PROCESS
       let data_ = json_Sync.createPropertyData({properties,data,value})
@@ -39,7 +39,7 @@ function createProperty({Debug,data,properties,value}) {
 /**
  *   Remplazara la propiedad ya existente, si no existe lanzara un error.
  */
-function replaceProperty({ Debug = false, data, properties, value }) {
+function replaceProperty({ Debug = false, data, properties, value,file }) {
 //TODO: crear una vercion open de esta funcion.  
 const NAME_ = "readJson";
 debug.name(Debug,NAME_, "service");
@@ -204,13 +204,14 @@ function putValuePropertyOpen({ Debug = false, value, file, properties }) {
  * putValueProperty({Debug: true, value: {"propiedad_a": "valor","propiedad_b": "valor"},properties: "prop.masProps.estaProp"});
  * ``` 
  */
-function putValueProperty({ Debug = false, value, data, properties }) {
+function putValueProperty({ Debug = false, value, data, properties,file }) {
   //TODO: crear una vercion de esta funcion open addValueOpen
-  const NAME_ = "putValuePropertyOpen";
+  const NAME_ = "putValueProperty";
   debug.name(Debug, NAME_, "service");
   if (value == undefined) throw new Error("value esta indefinido");
   if (data == undefined) throw new Error("data esta indefinido");
   if (properties == undefined) throw new Error("properties esta indefinido");
+  if (file == undefined) throw new Error("file esta indefinido");
   return new Promise((resolve, reject) => {
     const checkProps = json_Sync.checkProperty({
       data,
@@ -220,6 +221,7 @@ function putValueProperty({ Debug = false, value, data, properties }) {
       data,
       properties,
     });
+    if (typeof file !== "string") throw new Error(`file solo puede ser string, file es ${typeof file}`);
     if (checkProps == false)
       return reject(`No existe la propiedad ${properties}`);
     if (
