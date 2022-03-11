@@ -5,10 +5,9 @@
 const { exec } = require("child_process");
 const { join } = require("path");
 const { readFileSync, writeFile } = require("fs");
-//TODO: implementar el debuger sin destrcuturarlo.
-//TODO: cambiar todos los readFileSync por readFile asyncrono. Para usar sus callbacks.
 const debug = require("./debug");
 const { envFileRelative } = require("./env");
+const json_Promise = require("./json_Promise");
 //              typedef
 /**
  *
@@ -69,9 +68,10 @@ const bash_scripts = {
  * @param script Para escojer que scripts inyectar.
  * @return {void}
  */
-async function packageInit({ Debug, defaults, script }, callback) {
+async function packageInit({ Debug, defaults, script }) {
+  let scripts,Package,arg,read,data,scripts_validate
   const NAME_ = "packageInit";
-  debug.name(Debug,NAME_, "service");
+  debug.name(Debug, NAME_, "service");
   /* 
     Proceso packageInit
     * Primero se tiene que escojer que paquete de scripts se va a inyectar en el json. [sync] + 
@@ -83,47 +83,41 @@ async function packageInit({ Debug, defaults, script }, callback) {
         * Si no crearla [Promise] +
     * Por ultimo se inyectaran los scripts [Promise] +
     */
-  const scripts = choseScript({ Debug, defaults, script });
-  const Package = packageLocation;
-  const arg = {
+  scripts = choseScript({ Debug, defaults, script });
+  Package = packageLocation;
+  arg = {
     Package,
     scripts,
   };
-
-  debug.values(arg);
-  const read = readFileSync(Package, "utf-8");
+  debug.values(Debug, arg);
+  read = json_Promise.readJson({Debug,Package});
   // proceso en caso de que este vacio el package.json, se tiene que terminar el proceso, por que se esta usando callbacks.
   if (!read) {
-    processPackageEmpty({ Debug, scripts, Package }, () => {
-      processNoScript({ Debug, Package, scripts });
-    });
-    return;
+    await newPackage({Debug});
+    read = json_Promise.readJson({Debug,Package});
+    if (!read) throw new Error('Error al reiniciar el package.json');
+    data = JSON.parse(read);
+    await json_Promise.replaceProperty({Debug,data,properties: "dependencies",value: {}})
   }
+  data = data ? data : JSON.parse(read);
   // proceso en caso de que no exista el objeto script
   if (read) {
-    const data = JSON.parse(read);
-    checkProperty({ data, Debug, scripts, Package });
-  }
-  // proceso en que todo esta bien y solo anade los scripts.
-  if (debug) done(NAME_);
-  callback();
-}
-/**
- * Proceso para manejar el obejto script.
- *
- * Verifica si existe, el objeto script y si no lo crea, tambien agrega los scripts.
- */
-function processNoScript({ Debug, Package, scripts }) {
-  const read = readFileSync(Package, "utf-8");
-  if (read) {
-    const data = JSON.parse(read);
-    if (!checkProperty({ data, Debug })) {
-      createProperties({ Debug, data, Package }, () => {
-        addObjects({ Debug, data, scripts, Package });
-      });
+    scripts_validate = await json_Promise.checkProperty({Debug,data,properties:"scripts"});
+    if (!scripts_validate) {
+      json_Promise.createProperty({Debug,data,properties: "scripts",value: {}})
     }
+  } else{
+    throw new Error('El packaje.json esta vacio.');
   }
+if (read) {
+  json_Promise.putValueProperty({Debug,data,value: scripts,properties: "scripts"});
+} else {
+  throw new Error('El packaje.json esta vacio.');
 }
+  // proceso en que todo esta bien y solo anade los scripts.
+  debug.done(Debug, NAME_);
+}
+
 /**
  * Determina que scripts inyectar en el package.json, ya sea bash, cmd o powershell. Por defecto inyectara cmd.
  * @param Debug Para activar el debuger
@@ -154,72 +148,34 @@ function choseScript({ Debug, defaults, script }) {
   }
 }
 /**
- * En caso de que el package.json este vacio, se iniciara un nuevo package con "npm init -y", y continuara con el proceso para agregar los scripts. 
- * @param {{
-    debug: boolean
-    Package: string
- * }}
- * debug - Para activar el modo debug
- * @param Package - La ruta del package.json a ser inyectado.
- * @return - Retornara "true", si esta vacio el package de lo contrario retornara "false".
- */
-//TODO: esta funcion no debe continuar con el proceso de inyectar el script, solo debe hacer su trabajo de iniciar un nuevo paquete. eso quiere decir
-function processPackageEmpty({ debug, Package }, callback) {
-  const NAME_ = "packageEmpty";
-  if (debug) name(NAME_, "subservice");
-  warning("El package esta vacio, iniciando un nuevo package");
-  newPackage({ debug }, () => {
-    const read = readFileSync(Package, "utf-8");
-    if (read) {
-      const data = JSON.parse(read);
-      emptyObject({ debug, data, Package });
-      return;
-      //TODO: colocar un debug.succeess aqui
-    } else {
-      error("No se puede iniciar un nuevo package");
-      return;
-    }
-  });
-  callback();
-  if (debug) done(NAME_);
-}
-/**
  * Se encarga de volver a iniciar el package en caso de que este vacio. Por alguna razon cuando se inicia crea depenencias. 
 * @param {{
     debug: boolean
  * }}
     * debug - Para activar el modo debug.
-* @return {boolean} Regresa true si se pudo ejecutar el comando.
+* @return Regresa true si se pudo ejecutar el comando.
  */
 function newPackage({ Debug }) {
   const NAME_ = "newPackage";
-  debug.name(Debug,NAME_, "service");
+  debug.name(Debug, NAME_, "service");
   const command = "npm init -y";
   const arg = {
     command,
   };
-  debug.values(Debug,arg);
+  debug.values(Debug, arg);
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       debug.info("Iniciando un nuevo package:");
       if (error) return reject(error);
       if (stderr) return reject(stderr);
       debug.info(`Resultado: ${stdout}`);
-      debug.done(NAME_);
+      debug.done(Debug, NAME_);
     });
     resolve(true);
   });
 }
-/**
- * Verifica si existen los scripts inyectados con {@link addObjects} en el package.json.
- *
- * ? esta funcion podria ser checkProperties, de cuaquier archivo json, las properties se pasan por parametro. Pertenece al servicio, json_.
- *
- * sync
- */
-//TODO: falta por terminar
-function checkScripts() {}
-// --
 module.exports = {
   packageInit,
+  newPackage,
+  choseScript
 };

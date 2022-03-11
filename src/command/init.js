@@ -2,51 +2,63 @@
  * Modulo del proceso inicial del paquete, instala todos los componentes necesarios, para que funcione el paquete.
  * @module command/init
  */
-const program = require('commander');
-const {packageInit} = require('./../services/package');
-const dependencies = require('./../services/dependencies');
-const env = require('./../services/env');
-const nucleo = require('./../services/nucleo');
-const {start} = require('./../services/Debug');
+const program = require("commander");
+const { packageInit } = require("./../services/package");
+const dependencies = require("./../services/dependencies");
+const env = require("./../services/env");
+const nucleo = require("./../services/nucleo");
+const { start } = require("./../services/Debug");
 
 program
-.command('init')
-.description('Para agregar los scripts al package.json, por defecto agregara scripts de cmd')
-.option('-d, --Debug', 'Ejecuta un depurador del codigo.')
-.option('-cmd, --batch', 'Para inyectar scripts en batch.')
-.option('-sh, --bash', 'Para inyectar scripts en bash.')
-.option('-op, --onlyPackage', 'Solo agrega los scripts al package.json')
-.option('-od, --onlyDependencies', 'Solo agrega las dependencias para que funcionen los scripts')
-.option('-oe, --onlyEnvFile', 'Solo crea el archivo .env.core')
-.option('-on, --onlyNucleo', 'Solo crea la carpeta nucleo')
-.action((cmdObj) => {
-    const {Debug,onlyEnvFile,onlyNucleo,onlyDependencies,onlyPackage,sh,cmd} = cmdObj;
+  .command("init")
+  .description(
+    "Para agregar los scripts al package.json, por defecto agregara scripts de cmd"
+  )
+  .option("-d, --Debug", "Ejecuta un depurador del codigo.")
+  .option("-cmd, --batch", "Para inyectar scripts en batch.")
+  .option("-sh, --bash", "Para inyectar scripts en bash.")
+  .option("-op, --onlyPackage", "Solo agrega los scripts al package.json")
+  .option(
+    "-od, --onlyDependencies",
+    "Solo agrega las dependencias para que funcionen los scripts"
+  )
+  .option("-oe, --onlyEnvFile", "Solo crea el archivo .env.core")
+  .option("-on, --onlyNucleo", "Solo crea la carpeta nucleo")
+  .action((cmdObj) => {
+    const {
+      Debug,
+      onlyEnvFile,
+      onlyNucleo,
+      onlyDependencies,
+      onlyPackage,
+      sh,
+      cmd,
+    } = cmdObj;
 
     const defaults = {
-        package_: {
-            scripts_: "cmd"
-        }
-    }
+      package_: {
+        scripts_: "cmd",
+      },
+    };
     /**
      * Guarda todos los valores para ejecutar solo un proceso. Por ejemplo solo nucleo.
      */
     const only = {
-        onlyEnvFile,
-        onlyNucleo,
-        onlyDependencies,
-        onlyPackage
-    }
+      onlyEnvFile,
+      onlyNucleo,
+      onlyDependencies,
+      onlyPackage,
+    };
     /**
      * Objeto con valores booleanos, ayuda a escojer que script seran inyectados en el package.json
      */
     const script = {
-        sh,
-        cmd
-    }
+      sh,
+      cmd,
+    };
     if (Debug) start();
-    init({Debug,defaults,only,script});
-}
-)
+    init({ Debug, defaults, only, script });
+  });
 /**
  * Controla todo el flujo y la logica del comando.
  * 
@@ -67,14 +79,14 @@ program
  * @param onlyDeprendencies Para activar solo el proceso para instalar las dependencias {@link defaults}
  * @returns {void}
  */
-function init({Debug,only,defaults,script}) {
-//TODO: crear un error, si estan las optiones bash, batch o powerllshell al mismo timepo, crear un error, solo se puede usar una d estas a la vez.
-    const {onlyEnvFile,onlyNucleo,onlyDependencies,onlyPackage} = only;
-    if (onlyEnvFile||onlyNucleo||onlyDependencies||onlyPackage) {
-        initOnly({Debug,only,defaults,script});
-        return;
-    }
-    defaultProcess({Debug,defaults,script});
+function init({ Debug, only, defaults, script }) {
+  //TODO: crear un error, si estan las optiones bash, batch o powerllshell al mismo timepo, crear un error, solo se puede usar una d estas a la vez.
+  const { onlyEnvFile, onlyNucleo, onlyDependencies, onlyPackage } = only;
+  if (onlyEnvFile || onlyNucleo || onlyDependencies || onlyPackage) {
+    initOnly({ Debug, only, defaults, script });
+    return;
+  }
+  defaultProcess({ Debug, defaults, script });
 }
 /**
  * Es la ejecuccion por defecto de {@link init}
@@ -89,12 +101,11 @@ function init({Debug,only,defaults,script}) {
  * @param script Los scripts que se van a usar en el proceso del package.
  * @return {void}
  */
-function defaultProcess({Debug,script,defaults}) {
-    packageInit({Debug,script,defaults},()=>{
-        dependencies.dependenciesInit();
-    });
-    env.createEnv();
-    nucleo.nucleoInit({Debug});
+function defaultProcess({ Debug, script, defaults }) {
+  packageInit({ Debug, script, defaults });
+  dependencies.dependenciesInit();
+  env.createEnv();
+  nucleo.nucleoInit({ Debug });
 }
 /**
  * Se activa en caso de que se quiera ejecutar solo uno o varios procesos. Pero se quieran omitir otros.
@@ -107,19 +118,19 @@ function defaultProcess({Debug,script,defaults}) {
  * @param script Los scripts que se van a usar en el proceso del package.
  * @returns {void}
  */
-function initOnly({Debug,only,defaults,script}) {
-//TODO: implementar el debuger aqui, con un info o un name que diga, se activo onlyPackage.
-    const {onlyEnvFile,onlyNucleo,onlyDependencies,onlyPackage} = only;
-    if (onlyPackage) {
-        packageInit({Debug,defaults,script},()=>{});
-    }
-    if (onlyEnvFile) {
-        env.createEnv();
-    }
-    if (onlyNucleo) {
-        nucleo.nucleoInit({Debug});
-    }
-    if (onlyDependencies) {
-        dependencies.dependenciesInit();
-    }
+function initOnly({ Debug, only, defaults, script }) {
+  //TODO: implementar el debuger aqui, con un info o un name que diga, se activo onlyPackage.
+  const { onlyEnvFile, onlyNucleo, onlyDependencies, onlyPackage } = only;
+  if (onlyPackage) {
+    packageInit({ Debug, defaults, script });
+  }
+  if (onlyEnvFile) {
+    env.createEnv();
+  }
+  if (onlyNucleo) {
+    nucleo.nucleoInit({ Debug });
+  }
+  if (onlyDependencies) {
+    dependencies.dependenciesInit();
+  }
 }
