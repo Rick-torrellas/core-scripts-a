@@ -90,11 +90,11 @@ async function packageInit({ Debug, defaults, script }) {
     scripts,
   };
   debug.values(Debug, arg);
-  read = json_Promise.readJson({Debug,file:Package});
+  read = await json_Promise.readJson({Debug,file:Package});
   // proceso en caso de que este vacio el package.json, se tiene que terminar el proceso, por que se esta usando callbacks.
   if (!read) {
     await newPackage({Debug});
-    read = json_Promise.readJson({Debug,Package});
+    read = await json_Promise.readJson({Debug,Package});
     if (!read) throw new Error('Error al reiniciar el package.json');
     data = JSON.parse(read);
     await json_Promise.replaceProperty({Debug,data,properties: "dependencies",value: {}})
@@ -104,13 +104,13 @@ async function packageInit({ Debug, defaults, script }) {
   if (read) {
     scripts_validate = await json_Promise.checkProperty({Debug,data,properties:"scripts"});
     if (!scripts_validate) {
-      json_Promise.createProperty({Debug,data,properties: "scripts",value: {}})
+      await json_Promise.createProperty({Debug,data,properties: "scripts",value: {}})
     }
   } else{
     throw new Error('El packaje.json esta vacio.');
   }
 if (read) {
-  json_Promise.putValueProperty({Debug,data,value: scripts,properties: "scripts"});
+  await json_Promise.putValueProperty({Debug,data,value: scripts,properties: "scripts"});
 } else {
   throw new Error('El packaje.json esta vacio.');
 }
