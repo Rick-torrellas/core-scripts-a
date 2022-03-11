@@ -4,7 +4,6 @@
  */
 const { exec } = require("child_process");
 const { join } = require("path");
-const { readFileSync, writeFile } = require("fs");
 const debug = require("./debug");
 const { envFileRelative } = require("./env");
 const json_Promise = require("./json_Promise");
