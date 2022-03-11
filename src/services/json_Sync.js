@@ -319,8 +319,8 @@ function putValueData({ data, properties, value }) {
   if (data == undefined) throw new Error("data esta indefinido");
   if (properties == undefined) throw new Error("properties esta indefinido");
   if (value == undefined) throw new Error("value esta indefinido");
-  const checkProps = checkProperty(data, properties);
-  const checkType = checkPropertyType(data, properties);
+  const checkProps = checkProperty({data, properties});
+  const checkType = checkPropertyType({data, properties});
   if (condition) {
   }
   if (
