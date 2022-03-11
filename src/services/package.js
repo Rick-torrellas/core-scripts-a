@@ -90,7 +90,7 @@ async function packageInit({ Debug, defaults, script }) {
     scripts,
   };
   debug.values(Debug, arg);
-  read = json_Promise.readJson({Debug,Package});
+  read = json_Promise.readJson({Debug,file:Package});
   // proceso en caso de que este vacio el package.json, se tiene que terminar el proceso, por que se esta usando callbacks.
   if (!read) {
     await newPackage({Debug});
