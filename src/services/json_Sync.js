@@ -321,8 +321,6 @@ function putValueData({ data, properties, value }) {
   if (value == undefined) throw new Error("value esta indefinido");
   const checkProps = checkProperty({data, properties});
   const checkType = checkPropertyType({data, properties});
-  if (condition) {
-  }
   if (
     typeof data !== "object" ||
     data === null ||
