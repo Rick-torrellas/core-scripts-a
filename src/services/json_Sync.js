@@ -1,4 +1,25 @@
 /**
+ * Crea una nueva propiedad a la data, y se asigna un valor.
+ * @return {object} Retorna la data modificaada
+ */
+function createPropertyData({data,properties,value}) {
+if (checkProperty({data,properties})) throw new Error(`Ya existe la propiedad: ${properties}`);
+  // PROCESS
+  const props = properties.split('.');
+  console.log(props.length)
+  if (props.length == 1) {
+    data[props[0]] = value;
+    console.log(data)
+  } else {
+    let last = props.pop();
+    let noLast = props.join('.')
+    let add = eval(`data.${noLast}`);
+    add[last] = value;
+    data
+  }
+  return data;
+}
+/**
  * Remplazara la propiedad ya existente, si no existe lanzara un error.
  */
  function replacePropertyData({ data, properties, value }) {
@@ -35,36 +56,6 @@
     data
   }
   return data;
-}
-/**
- * Esta funcion se encarga de crear una nueva propiedad scripts, en caso de que no exista en el package.json y inyectar los scripts.
- * 
- * ? no es mejor transformar esta funcion que agrege cualquier objeto en el package.json?
- * @param {{
-    debug: boolean
-    data: any
-    Package: string
- * }}
-* debug - Para activar el modo debug.
-* @param data - El package.json que se esta editando.
-* @param Package - La ruta del package.json que se esta editando.
-* @return Retorna el pacjage.json que se esta editando. 
- */
-//TODO: crear una estancia de la funcion, donde no le entreguen solo la data, y el tengo que hacer el proceso completo, para editar el json.
-function createProperties({ Debug, data, Package }, callback) {
-  const NAME_ = "createProperties";
-    debug.name(NAME_, "service");
-  data.scripts = {};
-  const complete = JSON.stringify(data, null, 2);
-  writeFile(Package, complete, (err) => {
-    if (err) {
-      error("Error al crear el objeto script");
-      throw err;
-    }
-    console.log("objeto script creado");
-    callback();
-  });
-  if (debug) done(NAME_);
 }
 /**
  * Verifica si existe el package.json
@@ -482,5 +473,6 @@ module.exports = {
   checkPropertyTypeOpen,
   putValueData,
   putValueDataOpen,
-  replacePropertyData
+  replacePropertyData,
+  createPropertyData
 };

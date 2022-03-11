@@ -78,9 +78,9 @@ async function packageInit({ Debug, defaults, script }, callback) {
     * Abrir el archivo json [Promise] +
     * Luego se tiene que verificar si el json esta vacio [condicional]
         * En caso de que no reiniciarlo [Promise] +
-        * Vaciarles las depencias por que hay veces que viene con dependencias. [Promise]
+        * Vaciarles las depencias por que hay veces que viene con dependencias. [Promise] +
     * Verificar si existe la propiedad script [sync] +
-        * Si no crearla [Promise] 
+        * Si no crearla [Promise] +
     * Por ultimo se inyectaran los scripts [Promise] +
     */
   const scripts = choseScript({ Debug, defaults, script });

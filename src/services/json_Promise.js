@@ -5,24 +5,38 @@ const { readFile, writeFile } = require("fs");
 /* TODO: propiedades y valores
  Proceso de modificacion de propiedades y valores
  Para modificar las propiedades
- * replaceProperty
+ * replaceProperty +
  Remplazara la propiedad ya existente, si no existe lanzara un error. +
  * deleteProperty
  Eliminara una propiedad existente, si no existe lanzara un error. Se puede usar el operador delete.
- * createProperty
+ * createProperty 
  Creara una nueva propiedad, si existe lanzara un error.
  * addValueProperty
  Anade un valor al valor de una propiedad ya existente, si no existe la propiedad se lanzara un error.
- * putValueProperty
+ * putValueProperty +
  Anade valores a una propiedad, remplazando el valor anterior, pero respetndo el tipo de propiedad, si es string no le puede meter un object, etc. +
 */
+function createProperty({Debug,data,properties,value}) {
+ return new Promise((resolve,reject)=>{
+// PROCESS
+      let data_ = json_Sync.createPropertyData({properties,data,value})
+      const complete = JSON.stringify(data_, null, 2);
+      writeFile(file, complete, (err) => {
+        if (err) {
+          debug.done(Debug, NAME_);
+          return reject(err);
+        }
+        debug.data(Debug, "Propiedad creada", value);
+        debug.done(Debug, NAME_);
+        resolve(true);
+    })
+ })
+}
+/**
+ *   Remplazara la propiedad ya existente, si no existe lanzara un error.
+ */
 function replaceProperty({ Debug = false, data, properties, value }) {
-  /*
-   * Se verifica si existe la propiedad
-   * Si no se devuelve un error
-   * Luego se agrega la propiedad simplemente agregandola a la data, redefiniendola. data.propiedad = value
-   * duelve true si se logra la operacion
-   */
+//TODO: crear una vercion open de esta funcion.  
   const NAME_ = "readJson";
   debug.name(NAME_, "service");
   // CONDICIONES
