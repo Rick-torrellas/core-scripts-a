@@ -48,7 +48,9 @@ function nucleoInit({ Debug }) {
     hiddenNucleo({ Debug });
     createContentNucleo({ Debug });
   } else {
-    throw new Error("No se pudo crear el nucleo");
+    debug.error(
+      "No existe el nucleo, no se puede volver invisible y no se le puede agregar el contenido"
+    );
   }
   debug.done(Debug, NAME_);
 }
