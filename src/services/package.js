@@ -7,6 +7,7 @@ const { join } = require("path");
 const debug = require("./debug");
 const { envFileRelative } = require("./env");
 const json_Promise = require("./json_Promise");
+const filePromise = require('./filePromise');
 //TODO: verificar si existe el package.json, si no se tiene que crear.
 //              typedef
 /**
@@ -90,6 +91,7 @@ async function packageInit({ Debug, defaults, script }) {
     scripts,
   };
   debug.values(Debug, arg);
+  await handlePackage({Debug});
   read = await json_Promise.readJson({ Debug, file: Package });
   if (!read) {
     await newPackage({ Debug });
@@ -156,6 +158,20 @@ function handleDependencies({
     .catch((err) => {
       debug.error(err);
     }); // proceso en caso de que no exista el objeto dependencies
+}
+function handlePackage({Debug}) {
+  return new Promise((resolve) => {
+    resolve(filePromise.checkFile({ file: packageLocation }));
+  })
+  .then(res => {
+    if (!res) {
+      return newPackage({ Debug })
+    }
+    return false;
+  })
+  .catch(err => {
+    debug.error(err);
+  })
 }
 /**
  * Se encarga de verificar si existe el objeto scripts, si no existe se crea.
