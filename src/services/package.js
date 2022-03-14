@@ -7,6 +7,7 @@ const { join } = require("path");
 const debug = require("./debug");
 const { envFileRelative } = require("./env");
 const json_Promise = require("./json_Promise");
+//TODO: verificar si existe el package.json, si no se tiene que crear.
 //              typedef
 /**
  *
