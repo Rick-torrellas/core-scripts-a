@@ -291,8 +291,8 @@ function dependencies() {
             throw new Error(stderr);
           }
           console.log(`Resultado: ${stdout}`);
-          return true;
         });
+        return true;
       }
     })
     .catch((err) => {
