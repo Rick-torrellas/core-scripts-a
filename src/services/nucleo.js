@@ -5,7 +5,7 @@
 //TODO: implementar el debuger
 const { exec } = require("child_process");
 const path = require("path");
-const { existsSync, mkdir } = require("fs");
+const { existsSync, mkdirSync } = require("fs");
 const debug = require("./debug");
 /**
  * La ruta del .nucleo del proyecto actual.
@@ -35,10 +35,10 @@ const nucleoContent = {
   * Debug - Para activar el modo Debug
   * @return void
  */
-function nucleoInit({ Debug }) {
+async function nucleoInit({ Debug }) {
   const NAME_ = "nucleoInit";
   debug.name(Debug, NAME_, "service");
-  const nucleo = verifyNucleo({ Debug });
+  const nucleo = await verifyNucleo({ Debug });
   if (!nucleo) {
     createNucleo({ Debug });
   } else {
@@ -64,7 +64,6 @@ function nucleoInit({ Debug }) {
  */
 //TODO: esta funcion no deberia verificar si existe el nucleo antes de crearlo. tan solo debe crearlo, true si logro creralo y false
 //TODO: el proceso de verificado despues de crearlo, deberia colocarlo dentro del callback del mkdir, para que sea asyncrono.
-//TODO: esta funcion deberia ser un callback, por que es la primera en inciar el proceso.
 function createNucleo({ Debug }) {
   const NAME_ = "createNucleo";
   debug.name(Debug, NAME_, "service");
@@ -77,9 +76,7 @@ function createNucleo({ Debug }) {
     console.log("Ya existe el nucleo");
     return false;
   }
-  mkdir(folder, (err) => {
-    if (err) throw err;
-  });
+  mkdirSync(folder);
   if (verifyNucleo({ Debug })) {
     console.log("Nucleo creado");
     debug.done(Debug, NAME_);
@@ -95,24 +92,25 @@ function createNucleo({ Debug }) {
     Debug: boolean
  * }}
 * Debug - Para activar el debugger.
- * @return {boolean} Regresa true si existe, false si no existe
+ * @return  Regresa true si existe, false si no existe
  */
 //TODO: el path del nucleo, tiene que ser dado via parametro.
-function verifyNucleo({ Debug }) {
+function verifyNucleo({ Debug , nucleo=nucleoPath}) {
   const NAME_ = "verifyNucleo";
   debug.name(Debug, NAME_);
-  const nucleo = nucleoPath;
   const arg = {
     nucleo,
   };
   debug.values(Debug, arg);
-  if (existsSync(nucleo)) {
-    debug.done(Debug, NAME_);
-    return true;
-  } else {
-    debug.done(Debug, NAME_);
-    return false;
-  }
+  return new Promise(resolve => {
+    if (existsSync(nucleo)) {
+      debug.done(Debug, NAME_);
+      resolve(true);
+    } else {
+      debug.done(Debug, NAME_);
+      resolve(false);
+    }
+  })
 }
 /**
  * Vuelve invisible la carpeta nucleo.

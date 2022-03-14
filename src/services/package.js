@@ -84,7 +84,8 @@ async function packageInit({ Debug, defaults, script }) {
         * Si no crearla [Promise] +
     * Por ultimo se inyectaran los scripts [Promise] +
     */
-  scripts = choseScript({ Debug, defaults, script });
+  try {
+    scripts = choseScript({ Debug, defaults, script });
   Package = packageLocation;
   arg = {
     Package,
@@ -128,6 +129,9 @@ async function packageInit({ Debug, defaults, script }) {
     throw new Error("El packaje.json esta vacio.");
   }
   debug.done(Debug, NAME_);
+  } catch (error) {
+    debug.error(error);
+  }
 }
 function handlePackage({ Debug }) {
   const name = "handlePackage";
