@@ -268,7 +268,8 @@ function newPackage({ Debug }) {
 }
 function dependencies() {
   return new Promise((resolve, reject) => {
-    exec("npm i env-cmd", (error, stdout, stderr) => {
+    const dependencies = 'env-cmd';
+    exec(`npm i ${dependencies}`, (error, stdout, stderr) => {
       console.log("Instalando dependencias:");
       if (error) {
         return reject(error);
@@ -282,7 +283,8 @@ function dependencies() {
   })
     .then((res) => {
       if (res) {
-        exec("npm i @core_/scripts", (error, stdout, stderr) => {
+        const dependencies = "@core_/scripts"
+        exec(`npm i ${dependencies}`, (error, stdout, stderr) => {
           console.log("Instalando dependencias:");
           if (error) {
             throw new Error(error);
