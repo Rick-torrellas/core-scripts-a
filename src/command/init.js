@@ -6,7 +6,7 @@ const program = require("commander");
 const { packageInit } = require("./../services/package");
 const env = require("./../services/env");
 const nucleo = require("./../services/nucleo");
-const { start } = require("./../services/Debug");
+const { start } = require("./../services/debug");
 
 program
   .command("init")

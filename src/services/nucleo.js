@@ -6,7 +6,7 @@
 const { exec } = require("child_process");
 const path = require("path");
 const { existsSync, mkdir } = require("fs");
-const debug = require("./Debug");
+const debug = require("./debug");
 /**
  * La ruta del .nucleo del proyecto actual.
  */
