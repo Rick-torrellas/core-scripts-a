@@ -165,7 +165,7 @@ function handlePackage({Debug}) {
   })
   .then(res => {
     if (!res) {
-      return newPackage({ Debug })
+      return newPackage({ Debug });
     }
     return false;
   })
@@ -254,8 +254,8 @@ function newPackage({ Debug }) {
       if (stderr) return reject(stderr);
       debug.info(`Resultado: ${stdout}`);
       debug.done(Debug, NAME_);
+      resolve(true);
     });
-    resolve(true);
   });
 }
 function dependencies() {
