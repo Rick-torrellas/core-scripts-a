@@ -2,12 +2,12 @@
  * Modulo para controlar las funciones relacionadas con el package.json.
  * @module services/env
  */
-const { exec } = require("child_process");
+const { execSync } = require("child_process");
 const { join } = require("path");
 const debug = require("./debug");
 const { envFileRelative } = require("./env");
 const json_Promise = require("./json_Promise");
-const filePromise = require('./filePromise');
+const filePromise = require("./filePromise");
 //TODO: verificar si existe el package.json, si no se tiene que crear.
 //              typedef
 /**
@@ -91,24 +91,23 @@ async function packageInit({ Debug, defaults, script }) {
     scripts,
   };
   debug.values(Debug, arg);
-  await handlePackage({Debug});
+  await handlePackage({ Debug });
   read = await json_Promise.readJson({ Debug, file: Package });
   if (!read) {
     await newPackage({ Debug });
     read = await json_Promise.readJson({ Debug, file: Package });
     if (!read) throw new Error("Error al reiniciar el package.json");
-    //TODO: verificar si existen las dependencias, si no se tiene que crear.
     data = JSON.parse(read);
-    if (!(await handleDependencies({ Debug, data }))) {
-      await json_Promise.replaceProperty({
-        Debug,
-        data,
-      });
-    }
+    await json_Promise.replaceProperty({
+      Debug,
+      data,
+      properties: "dependencies",
+      value: {},
+      file: Package,
+    });
   }
   data = data ? data : JSON.parse(read);
   await dependencies();
-  await handleDependencies({ Debug, data });
   if (read) {
     await handleScripts({
       Debug,
@@ -130,56 +129,23 @@ async function packageInit({ Debug, defaults, script }) {
   }
   debug.done(Debug, NAME_);
 }
-/**
- * Se encarga de verificar si existe el objeto dependencies, si no existe se crea.
- */
-function handleDependencies({
-  Debug,
-  data,
-  properties = "dependencies",
-  value = {},
-  file = packageLocation,
-}) {
-  const name = "handleDependencies";
+function handlePackage({ Debug }) {
+  const name = "handlePackage";
   debug.name(Debug, name);
   return new Promise((resolve) => {
-    resolve(json_Promise.checkProperty({ Debug, data, properties }));
+    resolve(filePromise.checkFile({ file: packageLocation }));
   })
     .then((res) => {
       if (!res) {
         debug.done(Debug, name);
-        return json_Promise.createProperty({
-          Debug,
-          data,
-          properties,
-          value,
-          file,
-        });
+        return newPackage({ Debug });
       }
       debug.done(Debug, name);
       return false;
     })
     .catch((err) => {
       debug.error(err);
-    }); // proceso en caso de que no exista el objeto dependencies
-}
-function handlePackage({Debug}) {
-  const name = "handlePackage";
-  debug.name(Debug, name);
-  return new Promise((resolve) => {
-    resolve(filePromise.checkFile({ file: packageLocation }));
-  })
-  .then(res => {
-    if (!res) {
-      debug.done(Debug, name);
-      return newPackage({ Debug });
-    }
-    debug.done(Debug, name);
-    return false;
-  })
-  .catch(err => {
-    debug.error(err);
-  })
+    });
 }
 /**
  * Se encarga de verificar si existe el objeto scripts, si no existe se crea.
@@ -255,45 +221,27 @@ function newPackage({ Debug }) {
     command,
   };
   debug.values(Debug, arg);
-  return new Promise((resolve, reject) => {
-    exec(command, (error, stdout, stderr) => {
-      debug.info("Iniciando un nuevo package:");
-      if (error) return reject(error);
-      if (stderr) return reject(stderr);
-      debug.info(`Resultado: ${stdout}`);
-      debug.done(Debug, NAME_);
-      resolve(true);
-    });
+  return new Promise((resolve) => {
+    const result = execSync(command).toString();
+    console.log(result);
+    resolve(true);
   });
 }
 function dependencies() {
-  return new Promise((resolve, reject) => {
-    const dependencies = 'env-cmd';
-    exec(`npm i ${dependencies}`, (error, stdout, stderr) => {
-      console.log(`Instalando dependencias: ${dependencies}`);
-      if (error) {
-        return reject(error);
-      }
-      if (stderr) {
-        return reject(stderr);
-      }
-      console.log(`Resultado: ${stdout}`);
-      resolve(true);
-    });
+  const dependencies = "env-cmd";
+  const command = `npm install ${dependencies} `;
+  console.log(`Instalando dependencias: ${dependencies}`);
+  return new Promise((resolve) => {
+    const result = execSync(command).toString();
+    console.log(result);
+    resolve(true);
   })
     .then((res) => {
       if (res) {
-        const dependencies = "@core_/scripts"
-        exec(`npm i ${dependencies}`, (error, stdout, stderr) => {
-          console.log(`Instalando dependencias: ${dependencies}`);
-          if (error) {
-            throw new Error(error);
-          }
-          if (stderr) {
-            throw new Error(stderr);
-          }
-          console.log(`Resultado: ${stdout}`);
-        });
+        const dependencies = "@core_/scripts";
+        const command = `npm install ${dependencies}`;
+        const result = execSync(command).toString();
+        console.log(result);
         return true;
       }
     })
