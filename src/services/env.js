@@ -45,7 +45,7 @@ function createEnv() {
  * @param {string} envFile - El archivo env para verificar.
  * @returns {boolean} - Si ya existe el archivo .env retorna true, si no false.
  */
-function verifyEnv(envFile) {
+function verifyEnv(envFile=envFileAbsolute) {
     if (existsSync(envFile)) {
         return true;
     } else {
