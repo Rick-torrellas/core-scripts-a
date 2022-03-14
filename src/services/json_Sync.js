@@ -408,8 +408,8 @@ function putValueDataOpen({ file, properties, value }) {
   const read = readFileSync(file, "utf-8");
   const data = JSON.parse(read);
   if (!read) throw new Error(`El archivo json esta vacio`);
-  const checkProps = !json_Sync.checkProperty(data, properties);
-  const checkType = json_Sync.checkPropertyType(data, properties);
+  const checkProps = !checkProperty(data, properties);
+  const checkType = checkPropertyType(data, properties);
   if (
     typeof data !== "object" ||
     data === null ||

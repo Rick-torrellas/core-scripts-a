@@ -140,11 +140,14 @@ function handleDependencies({
   value = {},
   file = packageLocation,
 }) {
+  const name = "handleDependencies";
+  debug.name(Debug, name);
   return new Promise((resolve) => {
     resolve(json_Promise.checkProperty({ Debug, data, properties }));
   })
     .then((res) => {
       if (!res) {
+        debug.done(Debug, name);
         return json_Promise.createProperty({
           Debug,
           data,
@@ -153,6 +156,7 @@ function handleDependencies({
           file,
         });
       }
+      debug.done(Debug, name);
       return false;
     })
     .catch((err) => {
@@ -160,13 +164,17 @@ function handleDependencies({
     }); // proceso en caso de que no exista el objeto dependencies
 }
 function handlePackage({Debug}) {
+  const name = "handlePackage";
+  debug.name(Debug, name);
   return new Promise((resolve) => {
     resolve(filePromise.checkFile({ file: packageLocation }));
   })
   .then(res => {
     if (!res) {
+      debug.done(Debug, name);
       return newPackage({ Debug });
     }
+    debug.done(Debug, name);
     return false;
   })
   .catch(err => {

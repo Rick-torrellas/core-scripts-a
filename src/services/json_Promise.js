@@ -275,10 +275,10 @@ function putValueProperty({ Debug = false, value, data, properties,file }) {
  * @param {*} file
  * @param {*} properties
  * @param {*} innerProps
+ * @return {Promise <boolean>} `true` si existe la propiedad.
  * @example `checkProperty('./archivo.json','vaso');` verifica si existe `vaso` o `checkProperty('./archivo.json','vaso.color');` verifica si existe `color` ola
  */
  function checkProperty({Debug,data, properties}) {
-  //TODO: actualizar. ver checkProperty sync.
   const NAME_ = "checkPropertyOpen";
   debug.name(Debug,NAME_, "service");
   return new Promise((resolve) => {
@@ -292,7 +292,7 @@ function putValueProperty({ Debug = false, value, data, properties,file }) {
       debug.done(Debug, NAME_);
       resolve(false);
     }
-  })
+  });
 }
 /**
  * Verificara si existe una propiedad en el jason.
