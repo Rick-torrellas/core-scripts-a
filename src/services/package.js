@@ -92,6 +92,7 @@ async function packageInit({ Debug, defaults, script }) {
   };
   debug.values(Debug, arg);
   await handlePackage({ Debug });
+  await dependencies();
   read = await json_Promise.readJson({ Debug, file: Package });
   if (!read) {
     await newPackage({ Debug });
@@ -107,7 +108,6 @@ async function packageInit({ Debug, defaults, script }) {
     });
   }
   data = data ? data : JSON.parse(read);
-  await dependencies();
   if (read) {
     await handleScripts({
       Debug,
@@ -240,6 +240,7 @@ function dependencies() {
       if (res) {
         const dependencies = "@core_/scripts";
         const command = `npm install ${dependencies}`;
+        console.log(`Instalando dependencias: ${dependencies}`);
         const result = execSync(command).toString();
         console.log(result);
         return true;
