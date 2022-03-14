@@ -4,7 +4,6 @@
  */
 const program = require("commander");
 const { packageInit } = require("./../services/package");
-const dependencies = require("./../services/dependencies");
 const env = require("./../services/env");
 const nucleo = require("./../services/nucleo");
 const { start } = require("./../services/Debug");
@@ -18,23 +17,10 @@ program
   .option("-cmd, --batch", "Para inyectar scripts en batch.")
   .option("-sh, --bash", "Para inyectar scripts en bash.")
   .option("-op, --onlyPackage", "Solo agrega los scripts al package.json")
-  .option(
-    "-od, --onlyDependencies",
-    "Solo agrega las dependencias para que funcionen los scripts"
-  )
   .option("-oe, --onlyEnvFile", "Solo crea el archivo .env.core")
   .option("-on, --onlyNucleo", "Solo crea la carpeta nucleo")
   .action((cmdObj) => {
-    const {
-      Debug,
-      onlyEnvFile,
-      onlyNucleo,
-      onlyDependencies,
-      onlyPackage,
-      sh,
-      cmd,
-    } = cmdObj;
-
+    const { Debug, onlyEnvFile, onlyNucleo, onlyPackage, sh, cmd } = cmdObj;
     const defaults = {
       package_: {
         scripts_: "cmd",
@@ -46,7 +32,6 @@ program
     const only = {
       onlyEnvFile,
       onlyNucleo,
-      onlyDependencies,
       onlyPackage,
     };
     /**
@@ -69,7 +54,6 @@ program
     Debug: boolean
     onlyEnvFile: boolean
     onlyNucleo: boolean
-    onlyDependencies: boolean
     onlyPackage: boolean
  * }}
  * Debug  Para activar el modo debugger
@@ -81,8 +65,8 @@ program
  */
 function init({ Debug, only, defaults, script }) {
   //TODO: crear un error, si estan las optiones bash, batch o powerllshell al mismo timepo, crear un error, solo se puede usar una d estas a la vez.
-  const { onlyEnvFile, onlyNucleo, onlyDependencies, onlyPackage } = only;
-  if (onlyEnvFile || onlyNucleo || onlyDependencies || onlyPackage) {
+  const { onlyEnvFile, onlyNucleo, onlyPackage } = only;
+  if (onlyEnvFile || onlyNucleo || onlyPackage) {
     initOnly({ Debug, only, defaults, script });
     return;
   }
@@ -103,7 +87,6 @@ function init({ Debug, only, defaults, script }) {
  */
 function defaultProcess({ Debug, script, defaults }) {
   packageInit({ Debug, script, defaults });
-  dependencies.dependenciesInit();
   env.createEnv();
   nucleo.nucleoInit({ Debug });
 }
@@ -120,7 +103,7 @@ function defaultProcess({ Debug, script, defaults }) {
  */
 function initOnly({ Debug, only, defaults, script }) {
   //TODO: implementar el debuger aqui, con un info o un name que diga, se activo onlyPackage.
-  const { onlyEnvFile, onlyNucleo, onlyDependencies, onlyPackage } = only;
+  const { onlyEnvFile, onlyNucleo, onlyPackage } = only;
   if (onlyPackage) {
     packageInit({ Debug, defaults, script });
   }
@@ -129,8 +112,5 @@ function initOnly({ Debug, only, defaults, script }) {
   }
   if (onlyNucleo) {
     nucleo.nucleoInit({ Debug });
-  }
-  if (onlyDependencies) {
-    dependencies.dependenciesInit();
   }
 }

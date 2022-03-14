@@ -1,7 +1,7 @@
 /**
  * Modulo con promesas para controlar las funciones relacionadas con los archivos json.
  * @module services/env
- */
+ */ //
 const debug = require("./debug");
 const json_Sync = require("./json_Sync");
 const { readFile, writeFile } = require("fs");
@@ -20,18 +20,24 @@ const { readFile, writeFile } = require("fs");
  * putValueProperty +
  Anade valores a una propiedad, remplazando el valor anterior, pero respetndo el tipo de propiedad, si es string no le puede meter un object, etc. +
 */
+/**
+ * 
+ * @param {*} param0 
+ * @returns Retorna true si se logro crear la propiedad.
+ */
 function createProperty({Debug,data,properties,value,file}) {
  return new Promise((resolve,reject)=>{
+const name = "createProperty";
 // PROCESS
       let data_ = json_Sync.createPropertyData({properties,data,value})
       const complete = JSON.stringify(data_, null, 2);
       writeFile(file, complete, (err) => {
         if (err) {
-          debug.done(Debug, NAME_);
+          debug.done(Debug, name);
           return reject(err);
         }
         debug.data(Debug, "Propiedad creada", value);
-        debug.done(Debug, NAME_);
+        debug.done(Debug, name);
         resolve(true);
     })
  })
@@ -64,7 +70,7 @@ return new Promise((resolve, reject) => {
     file:string
  * }}
  * @param file El archivo json a leer.
- * @returns {string} Retorna el contenido del archivo json como string.
+ * @returns Retorna el contenido del archivo json como string.
  */
 function readJson({ Debug = false, file }) {
   const NAME_ = "readJson";
@@ -130,7 +136,7 @@ function putValuePropertyOpen({ Debug = false, value, file, properties }) {
   if (value == undefined) throw new Error("value esta indefinido");
   if (file == undefined) throw new Error("file esta indefinido");
   if (properties == undefined) throw new Error("properties esta indefinido");
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     resolve(readJsonObject({ Debug, file }));
   })
     .then((data) => {
@@ -275,7 +281,7 @@ function putValueProperty({ Debug = false, value, data, properties,file }) {
   //TODO: actualizar. ver checkProperty sync.
   const NAME_ = "checkPropertyOpen";
   debug.name(Debug,NAME_, "service");
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
 // PROCESS
     if (json_Sync.checkProperty({data,properties})) {
       debug.data(Debug, `Existen las propiedades ${properties}`);
@@ -335,11 +341,11 @@ function checkPropertyOpen({Debug,file, properties}) {
 * @param Package - La ruta del package.json que se esta editando.
  */
 //TODO: falta por terminar.
-function checkJson({ debug, file }) {
+function checkJson({ Debug, file }) {
   const NAME_ = "verifyNucleo";
   debug.name(Debug,NAME_, "sub-service");
   const arg = {
-    Package,
+    file,
   };
   debug.values(Debug,arg);
 }
@@ -411,7 +417,6 @@ module.exports = {
   checkPropertyOpen,
   checkJson,
   emptyObject,
-  checkProperties,
   checkProperty,
   createProperty
 };

@@ -9,8 +9,7 @@
   "directories": {
     "doc": "docs"
   },
-  "scripts": {
-  },
+  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rick-torrellas/core-scripts.git"
@@ -24,5 +23,9 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "commander": "^8.3.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^8.5.0"
   }
 }

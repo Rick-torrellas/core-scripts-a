@@ -68,7 +68,7 @@ const bash_scripts = {
  * @return {void}
  */
 async function packageInit({ Debug, defaults, script }) {
-  let scripts,Package,arg,read,data,scripts_validate
+  let scripts, Package, arg, read, data;
   const NAME_ = "packageInit";
   debug.name(Debug, NAME_, "service");
   /* 
@@ -89,32 +89,101 @@ async function packageInit({ Debug, defaults, script }) {
     scripts,
   };
   debug.values(Debug, arg);
-  read = await json_Promise.readJson({Debug,file:Package});
-  // proceso en caso de que este vacio el package.json, se tiene que terminar el proceso, por que se esta usando callbacks.
+  read = await json_Promise.readJson({ Debug, file: Package });
   if (!read) {
-    await newPackage({Debug});
-    read = await json_Promise.readJson({Debug,Package});
-    if (!read) throw new Error('Error al reiniciar el package.json');
+    await newPackage({ Debug });
+    read = await json_Promise.readJson({ Debug, file: Package });
+    if (!read) throw new Error("Error al reiniciar el package.json");
+    //TODO: verificar si existen las dependencias, si no se tiene que crear.
     data = JSON.parse(read);
-    await json_Promise.replaceProperty({Debug,data,properties: "dependencies",value: {},file: Package});
+    if (!(await handleDependencies({ Debug, data }))) {
+      await json_Promise.replaceProperty({
+        Debug,
+        data,
+      });
+    }
   }
   data = data ? data : JSON.parse(read);
-  // proceso en caso de que no exista el objeto script
+  await handleDependencies({ Debug, data });
+  await dependencies();
   if (read) {
-    scripts_validate = await json_Promise.checkProperty({Debug,data,properties:"scripts"});
-    if (!scripts_validate) {
-      await json_Promise.createProperty({Debug,data,properties: "scripts",value: {},file: Package})
-    }
-  } else{
-    throw new Error('El packaje.json esta vacio.');
+    await handleScripts({
+      Debug,
+      data,
+    });
+  } else {
+    throw new Error("El packaje.json esta vacio.");
   }
-if (read) {
-  await json_Promise.putValueProperty({Debug,data,value: scripts,properties: "scripts",file: Package});
-} else {
-  throw new Error('El packaje.json esta vacio.');
-}
-  // proceso en que todo esta bien y solo anade los scripts.
+  if (read) {
+    await json_Promise.putValueProperty({
+      Debug,
+      data,
+      property: "scripts",
+      value: scripts,
+      file: Package,
+    });
+  } else {
+    throw new Error("El packaje.json esta vacio.");
+  }
   debug.done(Debug, NAME_);
+}
+/**
+ * Se encarga de verificar si existe el objeto dependencies, si no existe se crea.
+ */
+function handleDependencies({
+  Debug,
+  data,
+  properties = "dependencies",
+  value = {},
+  file = packageLocation,
+}) {
+  return new Promise((resolve) => {
+    resolve(json_Promise.checkProperty({ Debug, data, properties }));
+  })
+    .then((res) => {
+      if (!res) {
+        return json_Promise.createProperty({
+          Debug,
+          data,
+          properties,
+          value,
+          file,
+        });
+      }
+      return false;
+    })
+    .catch((err) => {
+      debug.error(err);
+    }); // proceso en caso de que no exista el objeto dependencies
+}
+/**
+ * Se encarga de verificar si existe el objeto scripts, si no existe se crea.
+ */
+function handleScripts({
+  Debug,
+  data,
+  properties = "scripts",
+  value = {},
+  file = packageLocation,
+}) {
+  return new Promise((resolve) => {
+    resolve(json_Promise.checkProperty({ Debug, data, properties }));
+  })
+    .then((res) => {
+      if (!res) {
+        return json_Promise.createProperty({
+          Debug,
+          data,
+          properties,
+          value,
+          file,
+        });
+      }
+      return false;
+    })
+    .catch((err) => {
+      debug.error(err);
+    });
 }
 /**
  * Determina que scripts inyectar en el package.json, ya sea bash, cmd o powershell. Por defecto inyectara cmd.
@@ -123,7 +192,7 @@ if (read) {
  * @param scripts Los scripts para escojer cual script inyectar.
  * @returns
  */
-function choseScript({ Debug, defaults, script }) {
+function choseScript({ defaults, script }) {
   const { sh, cmd } = script;
   const {
     package_: { scripts_ },
@@ -172,8 +241,39 @@ function newPackage({ Debug }) {
     resolve(true);
   });
 }
+function dependencies() {
+  return new Promise((resolve, reject) => {
+    exec("npm i env-cmd", (error, stdout, stderr) => {
+      console.log("Instalando dependencias:");
+      if (error) {
+        return reject(error);
+      }
+      if (stderr) {
+        return reject(stderr);
+      }
+      console.log(`Resultado: ${stdout}`);
+      resolve(true);
+    })
+  })
+  .then(() => {
+    exec("npm i @core_/scripts", (error, stdout, stderr) => {
+      console.log("Instalando dependencias:");
+      if (error) {
+        throw new Error(error);
+      }
+      if (stderr) {
+        throw new Error(stderr);
+      }
+      console.log(`Resultado: ${stdout}`);
+      return (true);
+    })
+  })
+  .catch((err) => {
+    debug.error(err);
+  })
+}
 module.exports = {
   packageInit,
   newPackage,
-  choseScript
+  choseScript,
 };
