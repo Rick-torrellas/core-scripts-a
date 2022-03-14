@@ -107,8 +107,8 @@ async function packageInit({ Debug, defaults, script }) {
     }
   }
   data = data ? data : JSON.parse(read);
-  await handleDependencies({ Debug, data });
   await dependencies();
+  await handleDependencies({ Debug, data });
   if (read) {
     await handleScripts({
       Debug,
