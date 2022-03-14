@@ -270,7 +270,7 @@ function dependencies() {
   return new Promise((resolve, reject) => {
     const dependencies = 'env-cmd';
     exec(`npm i ${dependencies}`, (error, stdout, stderr) => {
-      console.log("Instalando dependencias:");
+      console.log(`Instalando dependencias: ${dependencies}`);
       if (error) {
         return reject(error);
       }
@@ -285,7 +285,7 @@ function dependencies() {
       if (res) {
         const dependencies = "@core_/scripts"
         exec(`npm i ${dependencies}`, (error, stdout, stderr) => {
-          console.log("Instalando dependencias:");
+          console.log(`Instalando dependencias: ${dependencies}`);
           if (error) {
             throw new Error(error);
           }
