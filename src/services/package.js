@@ -119,7 +119,7 @@ async function packageInit({ Debug, defaults, script }) {
     await json_Promise.putValueProperty({
       Debug,
       data,
-      property: "scripts",
+      properties: "scripts",
       value: scripts,
       file: Package,
     });
@@ -254,24 +254,26 @@ function dependencies() {
       }
       console.log(`Resultado: ${stdout}`);
       resolve(true);
-    })
+    });
   })
-  .then(() => {
-    exec("npm i @core_/scripts", (error, stdout, stderr) => {
-      console.log("Instalando dependencias:");
-      if (error) {
-        throw new Error(error);
+    .then((res) => {
+      if (res) {
+        exec("npm i @core_/scripts", (error, stdout, stderr) => {
+          console.log("Instalando dependencias:");
+          if (error) {
+            throw new Error(error);
+          }
+          if (stderr) {
+            throw new Error(stderr);
+          }
+          console.log(`Resultado: ${stdout}`);
+          return true;
+        });
       }
-      if (stderr) {
-        throw new Error(stderr);
-      }
-      console.log(`Resultado: ${stdout}`);
-      return (true);
     })
-  })
-  .catch((err) => {
-    debug.error(err);
-  })
+    .catch((err) => {
+      debug.error(err);
+    });
 }
 module.exports = {
   packageInit,
