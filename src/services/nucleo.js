@@ -38,14 +38,13 @@ async function nucleoInit({ Debug }) {
   try {
     const name = "nucleoInit";
   debug.name(Debug, name);
-  const nucleo = await dirPromise.checkDir({dir: nucleoPath},{Debug});
-  if (!nucleo) {
+  if (await dirPromise.checkDir({dir: nucleoPath},{Debug}) == false) {
     debug.data(Debug,"Creando un nuevo nucleo");
     await dirPromise.createDir({dir: nucleoPath},{Debug});
   } else {
     debug.warning(Debug, "Ya existe el nucleo");
   }
-  if (nucleo) {
+  if (await dirPromise.checkDir({dir: nucleoPath},{Debug}) == true) {
     await dirPromise.editAtribute({attr: "h", dir: nucleoPath,state: "+"},{Debug});
     await dirPromise.addContent({content: nucleoContent,Debug});
   } else {
