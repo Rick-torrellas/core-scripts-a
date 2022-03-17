@@ -3,10 +3,9 @@
  * @module services/env
  */
 //TODO: implementar el debuger
-const { exec } = require("child_process");
 const path = require("path");
-const { existsSync, mkdirSync } = require("fs");
 const debug = require("./debug");
+const dirPromise = require('./dirPromise');
 /**
  * La ruta del .nucleo del proyecto actual.
  */
@@ -36,147 +35,29 @@ const nucleoContent = {
   * @return void
  */
 async function nucleoInit({ Debug }) {
-  const NAME_ = "nucleoInit";
-  debug.name(Debug, NAME_, "service");
-  const nucleo = await verifyNucleo({ Debug });
+  try {
+    const name = "nucleoInit";
+  debug.name(Debug, name);
+  const nucleo = await dirPromise.checkDir({dir: nucleoPath},{Debug});
   if (!nucleo) {
-    createNucleo({ Debug });
+    debug.data(Debug,"Creando un nuevo nucleo");
+    await dirPromise.createDir({dir: nucleoPath},{Debug});
   } else {
     debug.warning(Debug, "Ya existe el nucleo");
   }
   if (nucleo) {
-    hiddenNucleo({ Debug });
-    createContentNucleo({ Debug });
+    await dirPromise.editAtribute({attr: "h", dir: nucleoPath,state: "+"},{Debug});
+    await dirPromise.addContent({content: nucleoContent,Debug});
   } else {
-    debug.error(
+    throw new Error(
       "No existe el nucleo, no se puede volver invisible y no se le puede agregar el contenido"
     );
   }
-  debug.done(Debug, NAME_);
-}
-/**
- * Va a crear la carpeta nucleo.
-* @param {{
-    Debug: boolean
- * }}
-* Debug - Para activar el debugger.
- * @returns void
- */
-//TODO: esta funcion no deberia verificar si existe el nucleo antes de crearlo. tan solo debe crearlo, true si logro creralo y false
-//TODO: el proceso de verificado despues de crearlo, deberia colocarlo dentro del callback del mkdir, para que sea asyncrono.
-function createNucleo({ Debug }) {
-  const NAME_ = "createNucleo";
-  debug.name(Debug, NAME_, "service");
-  var folder = nucleoPath;
-  const arg = {
-    folder,
-  };
-  debug.values(Debug, arg);
-  if (verifyNucleo({ Debug })) {
-    console.log("Ya existe el nucleo");
-    return false;
+  debug.done(Debug, name);
+  return true;
+  } catch (error) {
+    console.error(error);
   }
-  mkdirSync(folder);
-  if (verifyNucleo({ Debug })) {
-    console.log("Nucleo creado");
-    debug.done(Debug, NAME_);
-    return true;
-  }
-  debug.error("Error al crear el nucleo");
-  return false;
-}
-/**
- * Verifica si existe el nucleo syncronamente. 
- * 
-* @param {{
-    Debug: boolean
- * }}
-* Debug - Para activar el debugger.
- * @return  Regresa true si existe, false si no existe
- */
-//TODO: el path del nucleo, tiene que ser dado via parametro.
-function verifyNucleo({ Debug , nucleo=nucleoPath}) {
-  const NAME_ = "verifyNucleo";
-  debug.name(Debug, NAME_);
-  const arg = {
-    nucleo,
-  };
-  debug.values(Debug, arg);
-  return new Promise(resolve => {
-    if (existsSync(nucleo)) {
-      debug.done(Debug, NAME_);
-      resolve(true);
-    } else {
-      debug.done(Debug, NAME_);
-      resolve(false);
-    }
-  })
-}
-/**
- * Vuelve invisible la carpeta nucleo.
-* @param {{
-    Debug: boolean
- * }}
-* Debug - Para activar el debugger.
- */
-//TODO: La ruta del nucleo se la deberiamos pasar por parametros.
-function hiddenNucleo({ Debug }) {
-  const NAME_ = "hiddenNucleo";
-  debug.name(Debug, NAME_);
-  const nucleo = nucleoPath;
-  const command = `attrib +h "${nucleo}"`;
-  const arg = {
-    nucleo,
-    command,
-  };
-  debug.values(Debug, arg);
-  exec(command, (error, stdout, stderr) => {
-    if (error) {
-      console.log(`error: ${error.message}`);
-      return;
-    }
-    if (stderr) {
-      console.log(`stderr: ${stderr}`);
-      return;
-    }
-    console.log(`Resultado: ${stdout}`);
-  });
-  debug.done(Debug, NAME_);
-}
-/**
- * Crea el contenido del nucleo.
-* @param {{
-    Debug: boolean
- * }}
-* Debug - Para activar el debugger.
- */
-//TODO: el contenido del nucleo se deberia pasar por parmetro
-function createContentNucleo({ Debug }) {
-  const NAME_ = "createContentNucleo";
-  debug.name(Debug, NAME_);
-  const object = nucleoContent;
-  const arg = {
-    object,
-  };
-  debug.values(Debug, arg);
-  for (const key in object) {
-    if (Object.hasOwnProperty.call(object, key)) {
-      const element = object[key];
-      if (existsSync(element) == false) {
-        mkdir(element, (err) => {
-          if (err) throw err;
-          if (existsSync(element)) {
-            console.log(`Se creo correctamente: '${key}`);
-          } else {
-            console.log(`'No se pudo crear: '${key}`);
-          }
-        });
-      } else {
-        console.log(`${key}:' Ya esta creado'`);
-      }
-    }
-  }
-  debug.done(Debug, NAME_);
 }
 module.exports = {
   nucleoInit,
