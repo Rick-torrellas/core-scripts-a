@@ -46,7 +46,7 @@ async function nucleoInit({ Debug }) {
   }
   if (await dirPromise.checkDir({dir: nucleoPath},{Debug}) == true) {
     await dirPromise.editAtribute({attr: "h", dir: nucleoPath,state: "+"},{Debug});
-    await dirPromise.addContent({content: nucleoContent,Debug});
+    await dirPromise.addContent({content: nucleoContent},{Debug});
   } else {
     throw new Error(
       "No existe el nucleo, no se puede volver invisible y no se le puede agregar el contenido"
@@ -55,7 +55,8 @@ async function nucleoInit({ Debug }) {
   debug.done(Debug, name);
   return true;
   } catch (error) {
-    console.error(error);
+    debug.error(error);
+    console.log(error.lineNumber);
   }
 }
 module.exports = {

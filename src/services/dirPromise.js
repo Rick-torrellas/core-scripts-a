@@ -2,7 +2,7 @@ const {mkdirSync,rmSync,existsSync} = require("fs");
 const {execSync} = require("child_process");
 const debug = require('./debug');
 //TODO: se puede crear una funcion replaceDir, y ejecutar createDir({dir},{Debug,overwrite=true,recursive=true})
-function checkDir({dir},{Debug}) {
+function checkDir({dir},{Debug}={Debug:false}) {
 //TODO: crear una vercion de esta funcion que verifique el contenido de la carpeta checkDirContent()
     const name = "checkDir";
     debug.name(Debug, name);
@@ -15,7 +15,7 @@ function checkDir({dir},{Debug}) {
  * @param {string} attr Es el atributo que se asignara a la carpeta, estos pueden ser `h`: Hidden,`r`: Read-only,`s`: System,`a`: Archive,`t`: Temporary,`c`: Compressed,`o`: Offline,`i`: Not indexed,`e`: Encrypted,`x`: No Scrub,`u`: UnPinned,`p`: Pinned,`m`: Recall on Data Access 
  * @returns 
  */
-function editAtribute({attr,dir,state},{Debug}) {
+function editAtribute({attr,dir,state},{Debug}={Debug:false}) {
   const name = "editAtribute";
   debug.name(Debug, name);
   return new Promise((resolve)=>{
@@ -23,10 +23,11 @@ function editAtribute({attr,dir,state},{Debug}) {
   })
   .then(res => {
     if(res) {
-      const command = `attrib ${state}${attr} ${dir}`; 
-      if (attr !== "h" || attr !== "r" || attr !== "s" || attr !== "a" || attr !== "t" || attr !== "c" || attr !== "o" || attr !== "i" || attr !== "e" || attr !== "x" || attr !== "u" || attr !== "p" || attr !== "m" ) throw new Error(`El atributo: ${attr} no es valido, mirar los atributos validos.`);
+      const command = `attrib ${state}${attr} "${dir}"`; 
+      if (!(attr == "h" || attr == "r" || attr == "s" || attr == "a" || attr == "t" || attr == "c" || attr == "o" || attr == "i" || attr == "e" || attr == "x" || attr == "u" || attr == "p" || attr == "m") ) throw new Error(`El atributo: ${attr} no es valido, mirar los atributos validos.`);
       if (!(state == "-" || state == "+")) throw new Error(`El estado: ${state} no es valido, mirar los estados validos.`);
       const result = execSync(command);
+      console.log(command);
       console.log(result.toString());
       return(true);
     } else {
@@ -35,6 +36,7 @@ function editAtribute({attr,dir,state},{Debug}) {
   })
   .catch(err => {
     debug.error(err);
+    debug.error(err.lineNumer);
   });
 }
 /** @param {{
@@ -42,7 +44,7 @@ function editAtribute({attr,dir,state},{Debug}) {
  *}}
  * content: Un array con las rutas de las carpetas que se quieren crear. La carpeta contenedora no tiene que existir anteriormente.
  */
-async function addContent({content},{Debug}) {
+async function addContent({content},{Debug}={Debug:false}) {
   try {
     const NAME_ = "addContent";
   debug.name(Debug, NAME_);
@@ -53,7 +55,7 @@ async function addContent({content},{Debug}) {
   for (const key in content) {
     if (Object.hasOwnProperty.call(content, key)) {
       const element = content[key];
-      if (await checkDir({dir: element}) == false) {
+      if (await checkDir({dir: element},{Debug}) == false) {
        await createDir({dir: element},{Debug,recursive: true});
       } else {
         console.log(`${element}:' Ya esta creado'`);
@@ -64,14 +66,17 @@ async function addContent({content},{Debug}) {
   return true;
   } catch (error) {
     debug.error(error);
+    debug.error(error.lineNumer);
   }
 }
 /**
  * Crea una carpeta 
  * @returns True si logro crearla.
  */
-function createDir({dir},{Debug=false,overwrite=false,recursive=false}) {
-    const name = "createDir";
+function createDir({dir},{Debug,overwrite,recursive}={Debug:false,overwrite:false,recursive:false}) {
+//TODO: crear una vercion de esta funcion que verifique el contenido de la carpeta checkDirContent()
+//TODO: eliminar el overwrite y mas bien crear una funcion especial para remplazar una carpeta, usando el mismo proceso del overwrite, replaceDir.   
+  const name = "createDir";
     debug.name(Debug, name);
     return new Promise(resolve=>{ 
       resolve(existsSync(dir))
@@ -94,6 +99,7 @@ function createDir({dir},{Debug=false,overwrite=false,recursive=false}) {
     })
     .catch(err => {
       console.log(err);
+      console.log(err.lineNumer);
     })
 }
 module.exports = {

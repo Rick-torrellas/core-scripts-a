@@ -87,7 +87,7 @@ function init({ Debug, only, defaults, script }) {
  */
 function defaultProcess({ Debug, script, defaults }) {
   packageInit({ Debug, script, defaults });
-  env.createEnv();
+  env.envInit({Debug});
   nucleo.nucleoInit({ Debug });
 }
 /**
@@ -108,7 +108,7 @@ function initOnly({ Debug, only, defaults, script }) {
     packageInit({ Debug, defaults, script });
   }
   if (onlyEnvFile) {
-    env.createEnv();
+    env.envInit({Debug});
   }
   if (onlyNucleo) {
     nucleo.nucleoInit({ Debug });
