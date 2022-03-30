@@ -6,10 +6,12 @@
   "bin": {
     "core-scripts": "./src/index.js"
   },
-  "directories": {
-    "doc": "docs"
+  "scripts": {
+    "eslint": "eslint .",
+    "prettier": "prettier --write .",
+    "prepublish": "npm run prettier && npm run eslint",
+    "publish": "npm publish"
   },
-  "scripts": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rick-torrellas/core-scripts.git"
@@ -21,11 +23,13 @@
   },
   "homepage": "https://github.com/Rick-torrellas/core-scripts#readme",
   "dependencies": {
+    "@core_/cli-tools": "^0.3.2",
     "chalk": "^4.1.0",
     "commander": "^8.3.0"
   },
   "devDependencies": {
     "eslint": "^8.11.0",
-    "eslint-config-prettier": "^8.5.0"
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.6.1"
   }
 }

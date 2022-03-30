@@ -6,21 +6,21 @@ const program = require("commander");
 const { packageInit } = require("./../services/package");
 const env = require("./../services/env");
 const nucleo = require("./../services/nucleo");
-const { start } = require("./../services/debug");
+const { cliconsole } = require("@core_/cli-tools");
 
 program
   .command("init")
   .description(
     "Para agregar los scripts al package.json, por defecto agregara scripts de cmd"
   )
-  .option("-d, --Debug", "Ejecuta un depurador del codigo.")
+  .option("-v, --verbose", "Ejecuta un depurador del codigo.")
   .option("-cmd, --batch", "Para inyectar scripts en batch.")
   .option("-sh, --bash", "Para inyectar scripts en bash.")
   .option("-op, --onlyPackage", "Solo agrega los scripts al package.json")
   .option("-oe, --onlyEnvFile", "Solo crea el archivo .env.core")
   .option("-on, --onlyNucleo", "Solo crea la carpeta nucleo")
   .action((cmdObj) => {
-    const { Debug, onlyEnvFile, onlyNucleo, onlyPackage, sh, cmd } = cmdObj;
+    const { verbose, onlyEnvFile, onlyNucleo, onlyPackage, sh, cmd } = cmdObj;
     const defaults = {
       package_: {
         scripts_: "cmd",
@@ -41,8 +41,7 @@ program
       sh,
       cmd,
     };
-    if (Debug) start();
-    init({ Debug, defaults, only, script });
+    init({ verbose, defaults, only, script });
   });
 /**
  * Controla todo el flujo y la logica del comando.
@@ -51,66 +50,66 @@ program
  * 
  * Por defecto enyectara los scripts cmd.
  * @param {{
-    Debug: boolean
+    verbose: boolean
     onlyEnvFile: boolean
     onlyNucleo: boolean
     onlyPackage: boolean
  * }}
- * Debug  Para activar el modo debugger
+ * verbose  Para activar el modo verboseger
  * @param onlyEnvFile Para activar solo el proceso del archivo env.
  * @param onlyNucleo Para activar solo el proceso del nucleo
  * @param onlyPackage Para activar solo el proceso del package.json
  * @param onlyDeprendencies Para activar solo el proceso para instalar las dependencias {@link defaults}
  * @returns {void}
  */
-function init({ Debug, only, defaults, script }) {
+function init({ verbose, only, defaults, script }) {
   //TODO: crear un error, si estan las optiones bash, batch o powerllshell al mismo timepo, crear un error, solo se puede usar una d estas a la vez.
   const { onlyEnvFile, onlyNucleo, onlyPackage } = only;
   if (onlyEnvFile || onlyNucleo || onlyPackage) {
-    initOnly({ Debug, only, defaults, script });
+    initOnly({ verbose, only, defaults, script });
     return;
   }
-  defaultProcess({ Debug, defaults, script });
+  defaultProcess({ verbose, defaults, script });
 }
 /**
  * Es la ejecuccion por defecto de {@link init}
  * 
  * Iniciara todos los procesos, por defecto inyectara los scripts cmd.
  * @param {{
-    Debug: boolean
+    verbose: boolean
      
  * }}
- * Debug Para activar el modo debugger
+ * verbose Para activar el modo verboseger
  * @param defaults Los valores por defecto de cada proceso.
  * @param script Los scripts que se van a usar en el proceso del package.
- * @return {void}
+ * @return 
  */
-function defaultProcess({ Debug, script, defaults }) {
-  packageInit({ Debug, script, defaults });
-  env.envInit({Debug});
-  nucleo.nucleoInit({ Debug });
+async function defaultProcess({ verbose, script, defaults }) {
+  packageInit({ verbose, script, defaults });
+  env.envInit({verbose});
+  nucleo.nucleoInit({ verbose });
 }
 /**
  * Se activa en caso de que se quiera ejecutar solo uno o varios procesos. Pero se quieran omitir otros.
  * @param {{
-    Debug: boolean
+    verbose: boolean
  * }} 
- * @param Debug Para activar el debugger.
+ * @param verbose Para activar el verboseger.
  * @param only Objeto con los procesos a ejecutarse.
  * @param defaults Los valores por defecto de cada proceso.
  * @param script Los scripts que se van a usar en el proceso del package.
  * @returns {void}
  */
-function initOnly({ Debug, only, defaults, script }) {
-  //TODO: implementar el debuger aqui, con un info o un name que diga, se activo onlyPackage.
+function initOnly({ verbose, only, defaults, script }) {
+  //TODO: implementar el verboseer aqui, con un info o un name que diga, se activo onlyPackage.
   const { onlyEnvFile, onlyNucleo, onlyPackage } = only;
   if (onlyPackage) {
-    packageInit({ Debug, defaults, script });
+    packageInit({ verbose, defaults, script });
   }
   if (onlyEnvFile) {
-    env.envInit({Debug});
+    env.envInit({verbose});
   }
   if (onlyNucleo) {
-    nucleo.nucleoInit({ Debug });
+    nucleo.nucleoInit({ verbose });
   }
 }

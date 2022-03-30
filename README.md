@@ -1,4 +1,4 @@
-# core-scripts
+# @core_/scripts
 
 <img src="./public/icon.png" alt="title" width="20%">
 

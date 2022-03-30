@@ -67,7 +67,7 @@ const bash_scripts = {
  * Debug - Para activar el modo debug
  * @param defaults - Valores por defecto para los procesos.
  * @param script Para escojer que scripts inyectar.
- * @return {void}
+ * @return 
  */
 async function packageInit({ Debug, defaults, script }) {
   let scripts, Package, arg, read, data;
